@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, DateField, DecimalField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, NumberRange
 import sqlalchemy as sa
+import sqlalchemy.orm as so
 from app import db
 from app.models import User, Trip, ExchangeRates
 
@@ -55,8 +56,9 @@ class EditProfileForm(FlaskForm):
             
     def validate_currency(self, currency):
         '''Raise a ValidationError if currency not in ExchangeRates table.'''
-        exists = db.session.scalar(sa.select(
-            sa.exists().where(ExchangeRates.currency_from == currency.data)))
+        #exists = db.session.scalar(sa.select(
+        #    sa.exists().where(ExchangeRates.currency_from == currency.data)))
+        exists = currency in ["PLN", "EUR", "USD"] # temporary before exchangerates implementation
         if not exists:
             raise ValidationError('Please choose an existing currency.')
         
@@ -70,23 +72,50 @@ class TripForm(FlaskForm):
         self.user_id = user_id
 
     def validate_trip_name(self, trip_name):
-        '''Raise a ValidationError if currency not in Trips table.'''
+        '''Raise a ValidationError if trip name already selected by the same user.'''
+        trip = so.aliased(Trip)
         exists = db.session.scalar(sa.select(
-            sa.exists().where(sa.and_(Trip.trip_name == trip_name.data, self.user_id == Trip.user_id))))
-        if not exists:
+            sa.exists().where(sa.and_(trip.trip_name == trip_name.data, self.user_id == trip.user_id))))
+        if exists:
             raise ValidationError('Please choose a different trip name.')
         
 
 class ComponentForm(FlaskForm):
     component_name = StringField('Component name', validators=[DataRequired()])
     category_name = StringField('Category name', validators=[DataRequired()])
-    type_name = StringField('Category name', validators=[DataRequired()])
+    type_name = StringField('Type name', validators=[DataRequired()])
     base_cost = DecimalField('Cost', places=2, validators=[DataRequired(), NumberRange(min=0)])
     currency = StringField('Cost currency', default="PLN", validators=[Length(min=3, max=3)])
     description = TextAreaField('Description', validators=[Length(min=0, max=140)])
     start_date = DateField('Start date')
     end_date = DateField('End date')
+    submit = SubmitField('Submit')
+
+    def validate_category_name(self, category_name):
+        '''Raise a ValidationError if category not in ComponentCategory table.'''
+        #exists = db.session.scalar(sa.select(
+        #    sa.exists().where(ComponentCategory.category_name == category_name.data)))
+        exists = category_name.data in ["Transport", "Accomodation", "Entertainment"] # temporary before ComponentCategory implementation
+        if not exists:
+            raise ValidationError('Please choose an existing category.')
+        
+    def validate_currency(self, currency):
+        #exists = db.session.scalar(sa.select(
+        #    sa.exists().where(ExchangeRates.currency_from == currency.data)))
+        exists = currency.data in ["PLN", "EUR", "USD"] # temporary before ExchangeRates implementation
+        if not exists:
+            raise ValidationError('Please choose an existing currency.')
 
 
-
+    def validate(self, **kwargs):
+        # Standard validators
+        rv = FlaskForm.validate(self)
+        # Ensure all standard validators are met
+        if rv:
+            # Ensure end date >= start date
+            if self.start_date.data > self.end_date.data:
+                self.end_date.errors.append('Finish date must be set after the starting date.')
+                return False
+            return True
+        return False
 

@@ -46,10 +46,14 @@ class Trip(db.Model):
         index=True, default=lambda: datetime.now(timezone.utc))
     
     user: so.Mapped[User] = so.relationship(back_populates='trips')
-    components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='trip')  
+    components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='trip')
+
+    def get_total_cost(self) -> float:
+        cost = db.session.query(sa.func.sum(Component.base_cost)).filter(Component.trip_id == self.id).scalar()
+        return cost if not None else 0.0
 
     def __repr__(self):
-        return f'<Trip {self.trip_name}>'
+        return f'<Trip {self.trip_name}, trip_id {self.id}, user_id {self.user_id}>'
 
 
 class ComponentCategory(db.Model):    
@@ -91,11 +95,8 @@ class Component(db.Model):
     category: so.Mapped[ComponentCategory] = so.relationship(back_populates='components')
     type: so.Mapped[ComponentType] = so.relationship(back_populates='components')
 
-    def add_to_trip(self, trip: Trip):
-        pass
-
     def __repr__(self):
-        return f'<Component {self.component_name}>'
+        return f'<Component name {self.component_name}, cost {self.base_cost}>'
     
 
 class ExchangeRates(db.Model):    
