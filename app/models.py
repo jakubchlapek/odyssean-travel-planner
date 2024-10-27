@@ -11,7 +11,7 @@ class User(UserMixin, db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
     email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True)
-    preferred_currency: so.Mapped[Optional[str]] = so.mapped_column(sa.String(3))
+    preferred_currency: so.Mapped[Optional[str]] = so.mapped_column(sa.String(3), default="PLN")
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     created_at: so.Mapped[datetime] = so.mapped_column(
         index=True, default=lambda: datetime.now(timezone.utc))
@@ -19,14 +19,18 @@ class User(UserMixin, db.Model):
     trips: so.WriteOnlyMapped['Trip'] = so.relationship(back_populates='user')
 
 
-    def set_password(self, password):
+    def set_password(self, password: str) -> None:
+        if not isinstance(password, str):
+            raise TypeError("Password must be a string.")
+        if not password:
+            raise ValueError("Password cannot be empty.")
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password):
+    def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
     
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.username}>'    
     
 
 @login.user_loader
@@ -42,8 +46,8 @@ class Trip(db.Model):
         index=True, default=lambda: datetime.now(timezone.utc))
     
     user: so.Mapped[User] = so.relationship(back_populates='trips')
-    components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='trip')
-    
+    components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='trip')  
+
     def __repr__(self):
         return f'<Trip {self.trip_name}>'
 
@@ -53,6 +57,7 @@ class ComponentCategory(db.Model):
     category_name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True)
 
     component_types: so.WriteOnlyMapped['ComponentType'] = so.relationship(back_populates='category')
+    components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='category')
 
     def __repr__(self):
         return f'<Component category {self.category_name}>'
@@ -86,6 +91,9 @@ class Component(db.Model):
     category: so.Mapped[ComponentCategory] = so.relationship(back_populates='components')
     type: so.Mapped[ComponentType] = so.relationship(back_populates='components')
 
+    def add_to_trip(self, trip: Trip):
+        pass
+
     def __repr__(self):
         return f'<Component {self.component_name}>'
     
@@ -99,3 +107,5 @@ class ExchangeRates(db.Model):
 
     def __repr__(self):
         return f'<ExchangeRate {self.currency_from} to {self.currency_to} at rate {self.rate}>'
+    
+
