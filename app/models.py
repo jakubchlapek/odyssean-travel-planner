@@ -46,7 +46,7 @@ class Trip(db.Model):
         index=True, default=lambda: datetime.now(timezone.utc))
     
     user: so.Mapped[User] = so.relationship(back_populates='trips')
-    components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='trip')
+    components: so.WriteOnlyMapped['Component'] = so.relationship(cascade='all, delete', back_populates='trip', passive_deletes=True)
 
     def get_total_cost(self) -> float:
         cost = db.session.query(sa.func.sum(Component.base_cost)).filter(Component.trip_id == self.id).scalar()
@@ -83,7 +83,7 @@ class ComponentType(db.Model):
 
 class Component(db.Model):    
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    trip_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Trip.id), index=True)
+    trip_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Trip.id, ondelete='CASCADE'), index=True)
     category_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentCategory.id), index=True, default=1) # Category 1 is neutral
     type_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentType.id), index=True, default=1)
     component_name: so.Mapped[str] = so.mapped_column(sa.String(64))

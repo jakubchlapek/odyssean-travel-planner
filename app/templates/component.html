@@ -1,14 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Trip: {{ trip.trip_name }}</h1>
-    Cost: {{ trip.get_total_cost() }}<br>
-    <a href="{{ url_for('delete_trip', trip_id=trip.id) }}">Delete trip</a>
-    <h2>Trip components</h2>
-    {% for component in components %}
-        {% include '_component.html' %}
-    {% endfor %}
-    <h2>Add component</h2>
+    <h1>Component: {{ component.component_name }}</h1>
+    <a href="{{ url_for('delete_component', component_id=component.id) }}">Delete component</a>
+    <h2>Edit component</h2>
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>

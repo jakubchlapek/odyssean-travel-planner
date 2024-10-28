@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, TripForm, ComponentForm
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, TripForm, ComponentForm, EmptyForm
 from app.models import User, Trip, Component
 
 
@@ -64,7 +64,7 @@ def user(username):
 @app.route('/trip/<trip_id>', methods=['GET', 'POST'])
 @login_required
 def trip(trip_id):
-    trip = db.first_or_404(sa.select(Trip).where(sa.and_(Trip.id == trip_id, Trip.user_id == current_user.id)))
+    trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
     form = ComponentForm()
     if form.validate_on_submit():
         component = Component(
@@ -83,6 +83,58 @@ def trip(trip_id):
         return redirect(url_for('trip', trip_id=trip_id))
     components = db.session.scalars(trip.components.select())
     return render_template('trip.html', trip=trip, components=components, form=form)
+
+
+@app.route('/delete_trip/<trip_id>')
+@login_required
+def delete_trip(trip_id):
+    trip = db.session.scalar(
+        sa.select(Trip)
+        .where(sa.and_(Trip.id == trip_id, Trip.user_id == current_user.id)))
+    if trip is None:
+        flash("Trip not found or you do not have permission to delete it.")
+        return redirect(url_for('index'))
+    db.session.delete(trip)
+    db.session.commit()
+    flash("Trip deleted successfully.")
+    return redirect(url_for('index'))
+
+
+@app.route('/component/<component_id>', methods=['GET', 'POST'])
+@login_required
+def component(component_id):
+    component = db.first_or_404(sa.select(Component).where(Component.id == component_id))
+    form = ComponentForm()
+    if form.validate_on_submit():
+        component.category_id = form.category_id.data,
+        component.type_id = form.type_id.data,
+        component.component_name = form.component_name.data,
+        component.base_cost = form.base_cost.data,
+        component.currency = form.currency.data,
+        component.description = form.description.data,
+        component.start_date = form.start_date.data,
+        component.end_date = form.end_date.data
+        db.session.commit()
+        flash('Your component has been updated!')
+        return redirect(url_for('trip', component_id=component_id))
+    return render_template('component.html', component=component, form=form)
+
+
+@app.route('/delete_component/<component_id>')
+@login_required
+def delete_component(component_id):
+    component = db.session.scalar(
+        sa.select(Component)
+        .join(Trip)
+        .where(sa.and_(Component.id == component_id, Trip.user_id == current_user.id)))
+    if component is None:
+        flash("Component not found or you do not have permission to delete it.")
+        return redirect(url_for('index'))
+    trip_id = component.trip_id
+    db.session.delete(component)
+    db.session.commit()
+    flash("Component deleted successfully.")
+    return redirect(url_for('trip', trip_id=trip_id))
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required

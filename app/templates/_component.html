@@ -1,8 +1,7 @@
 <table>
     <tr valign="top">
         <td>
-            <a>
-                {{ component.component_name }}
+            <a href="{{ url_for('component', component_id=component.id) }}">
                 {{ component }}
             </a>
         </td>

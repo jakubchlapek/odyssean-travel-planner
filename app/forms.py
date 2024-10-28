@@ -119,3 +119,6 @@ class ComponentForm(FlaskForm):
             return True
         return False
 
+
+class EmptyForm(FlaskForm):
+    submit = SubmitField('Submit')
