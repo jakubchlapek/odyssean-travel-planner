@@ -4,7 +4,7 @@ os.environ['DATABASE_URL'] = 'sqlite://'
 from datetime import datetime, timezone, timedelta
 import unittest
 from app import app, db
-from app.models import User
+from app.models import User, Trip, Component
 
 class UserModelCase(unittest.TestCase):
     def setUp(self):
@@ -18,11 +18,56 @@ class UserModelCase(unittest.TestCase):
         self.app_context.pop()
 
     def test_password_hashing(self):
-        u = User(username="susan", email="susan@example.com")
-        u.set_password('cat')
-        self.assertFalse(u.check_password('dog'))
-        self.assertTrue(u.check_password('cat'))
+        u = User(username="traveler", email="traveler@example.com")
+        u.set_password('backpack')
+        self.assertNotEqual(u.password_hash, 'backpack')
+        self.assertFalse(u.check_password('cruise'))
+        self.assertTrue(u.check_password('backpack'))
 
+    def test_user_trip_relationship(self):
+        # Create mock user
+        u = User(username="traveler", email="traveler@example.com")
+        db.session.add(u)
+        db.session.commit()
+        # Add 2 trips
+        t1 = Trip(user_id=u.id, trip_name="Paris 2024")
+        t2 = Trip(user_id=u.id, trip_name="Scotland 2025")
+        db.session.add_all([t1, t2])
+        db.session.commit()
+        # Check if they have been added properly
+        u_t = db.session.scalars(u.trips.select()).all()
+        self.assertEqual(len(u_t), 2)
+        self.assertEqual(u_t[0].trip_name, "Paris 2024")
+        self.assertEqual(u_t[1].trip_name, "Scotland 2025")
+
+    def test_get_total_cost_no_components(self):
+        # Create mock user
+        u = User(username="traveler", email="traveler@example.com")
+        db.session.add(u)
+        db.session.commit()
+        # Add empty trip
+        t = Trip(user_id=u.id, trip_name="Trip1")
+        db.session.add(t)
+        db.session.commit()
+        # Trip without components should have a cost of 0.0
+        self.assertEqual(t.get_total_cost(), 0.0) 
+
+    def test_get_total_cost_with_components(self):
+        # Create mock user
+        u = User(username="traveler", email="traveler@example.com")
+        db.session.add(u)
+        db.session.commit()
+        # Add empty trip
+        t = Trip(user_id=u.id, trip_name="Trip1")
+        db.session.add(t)
+        db.session.commit()
+        # Add 2 components
+        c1 = Component(trip=t, component_name="Hotel Eiffel Tower", base_cost=200.00, currency="PLN")
+        c2 = Component(trip=t, component_name="Flight to Paris", base_cost=300.00, currency="PLN")
+        db.session.add_all([c1, c2])
+        db.session.commit()
+        # Trip with components should calculate total cost correctly
+        self.assertEqual(t.get_total_cost(), 500.0) 
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

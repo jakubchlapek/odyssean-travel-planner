@@ -50,7 +50,9 @@ class Trip(db.Model):
 
     def get_total_cost(self) -> float:
         cost = db.session.query(sa.func.sum(Component.base_cost)).filter(Component.trip_id == self.id).scalar()
-        return cost if not None else 0.0
+        if not cost:
+            cost = 0.0
+        return cost
 
     def __repr__(self):
         return f'<Trip {self.trip_name}, trip_id {self.id}, user_id {self.user_id}>'
@@ -82,8 +84,8 @@ class ComponentType(db.Model):
 class Component(db.Model):    
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     trip_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Trip.id), index=True)
-    category_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentCategory.id), index=True)
-    type_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentType.id), index=True)
+    category_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentCategory.id), index=True, default=1) # Category 1 is neutral
+    type_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentType.id), index=True, default=1)
     component_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     base_cost: so.Mapped[float] = so.mapped_column(sa.DECIMAL(10, 2))
     currency: so.Mapped[str] = so.mapped_column(sa.String(3))
