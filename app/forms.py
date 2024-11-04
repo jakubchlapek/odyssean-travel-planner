@@ -90,10 +90,6 @@ class ComponentForm(FlaskForm):
     end_date = DateField('End date')
     submit = SubmitField('Submit')
 
-    def __init__(self, categories, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.category_name.choices = [(category.id, category.name) for category in categories]  # Update choices based on fetched categories
-    
     def validate_category_name(self, category_name):
         '''Raise a ValidationError if category not in ComponentCategory table.'''
         #exists = db.session.scalar(sa.select(

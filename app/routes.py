@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, TripForm, ComponentForm, EmptyForm
-from app.models import User, Trip, Component
+from app.models import User, Trip, Component, ComponentCategory
 
 
 
@@ -66,6 +66,8 @@ def user(username):
 def trip(trip_id):
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
     form = ComponentForm()
+    form.category_name.choices = [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
+    print(db.session.scalars(sa.select(ComponentCategory)).all())
     if form.validate_on_submit():
         component = Component(
                 trip_id = trip_id,
