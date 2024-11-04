@@ -38,7 +38,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('category_id', sa.Integer(), nullable=False),
     sa.Column('type_name', sa.String(length=64), nullable=False),
-    sa.ForeignKeyConstraint(['category_id'], ['component_category.id'], ),
+    sa.ForeignKeyConstraint(['category_id'], ['component_category.id'], name='fk_component_type_category_id' ),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('component_type', schema=None) as batch_op:
@@ -50,7 +50,7 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('trip_name', sa.String(length=64), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], name='fk_trip_user_id'),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('trip', schema=None) as batch_op:
@@ -68,9 +68,9 @@ def upgrade():
     sa.Column('description', sa.Text(), nullable=True),
     sa.Column('start_date', sa.DateTime(), nullable=True),
     sa.Column('end_date', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['category_id'], ['component_category.id'], ),
-    sa.ForeignKeyConstraint(['trip_id'], ['trip.id'], ),
-    sa.ForeignKeyConstraint(['type_id'], ['component_type.id'], ),
+    sa.ForeignKeyConstraint(['trip_id'], ['trip.id'], name='fk_component_trip_id'),
+    sa.ForeignKeyConstraint(['category_id'], ['component_category.id'], name='fk_component_category_id'),
+    sa.ForeignKeyConstraint(['type_id'], ['component_type.id'], name='fk_component_type_id'),
     sa.PrimaryKeyConstraint('id')
     )
     with op.batch_alter_table('component', schema=None) as batch_op:

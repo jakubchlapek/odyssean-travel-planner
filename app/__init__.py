@@ -28,3 +28,5 @@ if not app.debug:
     app.logger.info('Starting up Travel Planner!')
 
 from app import routes, models, errors
+
+

@@ -20,7 +20,7 @@
         </p>
         <p>
             {{ form.category_name.label }}<br>
-            {{ form.category_name(size=32) }}<br>
+            {{ form.category_name() }}<br>
             {% for error in form.category_name.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}

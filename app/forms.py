@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, DateField, DecimalField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, DateField, DecimalField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, NumberRange
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from app import db
-from app.models import User, Trip, ExchangeRates
+from app.models import User, Trip, ExchangeRates, ComponentCategory
 
 
 class LoginForm(FlaskForm):
@@ -24,16 +24,16 @@ class RegistrationForm(FlaskForm):
 
     def validate_username(self, username): # wtflask automatically checks any validate_<field_name> with validation and will raise ValidationErrors
         '''Raise a ValidationError if username taken'''
-        user = db.session.scalar(sa.select(User).where(
-            User.username == username.data))
-        if user is not None:
+        exists = db.session.scalar(
+            sa.select(sa.exists().where(User.username == username.data)))
+        if exists:
             raise ValidationError('Please use a different username.')
         
     def validate_email(self, email):
         '''Raise a ValidationError if email taken'''
-        email = db.session.scalar(sa.select(
-            sa.exists().where(User.email == email.data)))
-        if email is not None:
+        exists = db.session.scalar(
+            sa.select(sa.exists().where(User.email == email.data)))
+        if exists:
             raise ValidationError('Please use a different email address.')
         
 
@@ -79,10 +79,9 @@ class TripForm(FlaskForm):
         if exists:
             raise ValidationError('Please choose a different trip name.')
         
-
 class ComponentForm(FlaskForm):
     component_name = StringField('Component name', validators=[DataRequired()])
-    category_name = StringField('Category name', validators=[DataRequired()])
+    category_name = SelectField('Category name', choices=[], validators=[DataRequired()])
     type_name = StringField('Type name', validators=[DataRequired()])
     base_cost = DecimalField('Cost', places=2, validators=[DataRequired(), NumberRange(min=0)])
     currency = StringField('Cost currency', default="PLN", validators=[Length(min=3, max=3)])
@@ -91,6 +90,10 @@ class ComponentForm(FlaskForm):
     end_date = DateField('End date')
     submit = SubmitField('Submit')
 
+    def __init__(self, categories, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.category_name.choices = [(category.id, category.name) for category in categories]  # Update choices based on fetched categories
+    
     def validate_category_name(self, category_name):
         '''Raise a ValidationError if category not in ComponentCategory table.'''
         #exists = db.session.scalar(sa.select(

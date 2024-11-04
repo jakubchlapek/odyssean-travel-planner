@@ -5,6 +5,7 @@ from typing import Optional
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin # Adds safe implementations of 4 elements (is_authenticated, get_id(), etc...)
 from app import db, login
+from config import INIT_CATEGORIES, INIT_TYPES
 
 
 class User(UserMixin, db.Model):
@@ -40,7 +41,7 @@ def load_user(id): # Function for flask-login
 
 class Trip(db.Model):
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id), index=True)
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id, name='fk_trip_user_id'), index=True)
     trip_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     created_at: so.Mapped[datetime] = so.mapped_column(
         index=True, default=lambda: datetime.now(timezone.utc))
@@ -60,7 +61,7 @@ class Trip(db.Model):
 
 class ComponentCategory(db.Model):    
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    category_name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True)
+    category_name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
 
     component_types: so.WriteOnlyMapped['ComponentType'] = so.relationship(back_populates='category')
     components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='category')
@@ -68,10 +69,15 @@ class ComponentCategory(db.Model):
     def __repr__(self):
         return f'<Component category {self.category_name}>'
     
+@sa.event.listens_for(ComponentCategory.__table__, 'after_create')
+def create_categories(*args, **kwargs):
+    for category_name in INIT_CATEGORIES:
+        db.session.add(ComponentCategory(category_name=category_name))
+    
 
 class ComponentType(db.Model):    
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    category_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentCategory.id), index=True)
+    category_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentCategory.id, name='fk_component_type_category_id'), index=True)
     type_name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True)
 
     category: so.Mapped[ComponentCategory] = so.relationship(back_populates='component_types')
@@ -80,12 +86,24 @@ class ComponentType(db.Model):
     def __repr__(self):
         return f'<Component category {self.category_name}>'
     
+@sa.event.listens_for(ComponentType.__table__, 'after_create')
+def create_categories(*args, **kwargs):
+    for category_name, types in INIT_TYPES.items():
+        category = db.session.scalar(
+            sa.select(ComponentCategory)
+            .where(ComponentCategory.category_name == category_name))
+        for type_name in types:
+            db.session.add(ComponentType(category_id=category.id, type_name=type_name))
+    
 
 class Component(db.Model):    
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    trip_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(Trip.id, ondelete='CASCADE'), index=True)
-    category_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentCategory.id), index=True, default=1) # Category 1 is neutral
-    type_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentType.id), index=True, default=1)
+    trip_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey('trip.id', name='fk_component_trip_id', ondelete='CASCADE'), index=True)
+    category_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey('component_category.id', name='fk_component_category_id'), index=True, default=1)  # Category 1 is neutral
+    type_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey('component_type.id', name='fk_component_type_id'), index=True, default=1)
     component_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     base_cost: so.Mapped[float] = so.mapped_column(sa.DECIMAL(10, 2))
     currency: so.Mapped[str] = so.mapped_column(sa.String(3))
@@ -111,4 +129,33 @@ class ExchangeRates(db.Model):
     def __repr__(self):
         return f'<ExchangeRate {self.currency_from} to {self.currency_to} at rate {self.rate}>'
     
+
+
+
+
+
+def init_db():
+    '''Initialize the database with default categories and types'''    
+    for category_name in INIT_CATEGORIES:
+        category = db.session.scalar(
+            sa.select(ComponentCategory)
+            .where(ComponentCategory.category_name == category_name))
+        if not category:
+            db.session.add(ComponentCategory(category_name=category_name))
+
+    db.session.commit()
+
+    for category_name, types in INIT_TYPES.items():
+        category = db.session.scalar(
+            sa.select(ComponentCategory)
+            .where(ComponentCategory.category_name == category_name))
+        if category:
+            for type_name in types:
+                component_type = db.session.scalar(sa.select(ComponentType)
+                                               .where(sa.and_(ComponentType.category_id == category.id, 
+                                                              ComponentType.type_name == type_name)))
+                if not component_type:
+                    db.session.add(ComponentType(category_id=category.id, type_name=type_name))
+                    
+    db.session.commit()
 
