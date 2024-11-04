@@ -1,9 +1,13 @@
 <table>
     <tr valign="top">
         <td>
-            <a href="{{ url_for('component', component_id=component.id) }}">
-                {{ component }}
-            </a>
+            <a>{{ component }}</a>
+        </td> 
+        <td>
+            &emsp;<a href="{{ url_for('component', component_id=component.id) }}">Edit</a>
+        </td>
+        <td>
+            &emsp;<a href="{{ url_for('delete_component', component_id=component.id) }}">Delete</a>
         </td>
     </tr>
 </table>

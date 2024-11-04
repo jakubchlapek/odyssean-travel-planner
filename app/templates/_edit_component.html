@@ -1,0 +1,89 @@
+{% block content %}
+    <form action="" method="post">
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.component_name.label }}<br>
+            {{ form.component_name(size=32) }}<br>
+            {% for error in form.component_name.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.category_id.label }}<br>
+            {{ form.category_id() }}<br>
+            {% for error in form.category_id.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.type_id.label }}<br>
+            {{ form.type_id() }}<br>
+            {% for error in form.type_id.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.base_cost.label }}<br>
+            {{ form.base_cost() }}<br>
+            {% for error in form.base_cost.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.currency.label }}<br>
+            {{ form.currency(size=1) }}<br>
+            {% for error in form.currency.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.description.label }}<br>
+            {{ form.description(rows=4, cols=32) }}<br>
+            {% for error in form.description.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.start_date.label }}<br>
+            {{ form.start_date() }}<br>
+            {% for error in form.start_date.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>
+            {{ form.end_date.label }}<br>
+            {{ form.end_date() }}<br>
+            {% for error in form.end_date.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <script> 
+        // Script for dynamically updating the type select based on the category select
+        let category_select = document.getElementById('category_id');
+        let type_select = document.getElementById('type_id');
+
+        // Function for updating
+        function updateTypeSelect() {
+            category_id = category_select.value;
+            fetch('/type/' + category_id).then(function(response) {
+                response.json().then(function(data) {
+                    let optionHTML = '';
+                    for (let type of data.types) {
+                        optionHTML += '<option value="' + type[0] + '">' + type[1] + '</option>'; // type[0] is the id, type[1] is the name
+                    }
+                    type_select.innerHTML = optionHTML;
+                });
+            });
+        };
+
+        // Update type options when the category changes
+        category_select.onchange = updateTypeSelect;
+        
+        // Trigger updateTypeOptions on page load to set a default type option
+        if (!type_select.value || category_select.value) {
+            window.onload = updateTypeSelect;
+        }        
+    </script>
+{% endblock %}

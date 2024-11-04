@@ -95,7 +95,7 @@ class ComponentForm(FlaskForm):
         exists = db.session.scalar(sa.select(
             sa.exists().where(ComponentCategory.id == category_id.data)))
         if not exists:
-            raise ValidationError('Please choose an existing category.')
+            raise ValidationError('Please choose an existing category.')    
         
     def validate_type_id(self, type_id):
         '''Raise a ValidationError if type not in ComponentType table.'''

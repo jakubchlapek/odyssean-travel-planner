@@ -30,4 +30,5 @@ if not app.debug:
 from app import routes, models, errors
 
 with app.app_context():
-    db.create_all()
+    models.populate_initial_data()  # Populate tables with initial data
+

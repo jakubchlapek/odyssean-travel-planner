@@ -1,10 +1,13 @@
 <table>
     <tr valign="top">
         <td>
-            <a href="{{ url_for('trip', trip_id=trip.id) }}">
-                {{ trip.trip_name }}
-                {{ trip }}
-            </a>
+            <a>{{ trip }}</a>
+            <td>
+                &emsp;<a href="{{ url_for('trip', trip_id=trip.id) }}">Edit</a>
+            </td>
+            <td>
+                &emsp;<a href="{{ url_for('delete_trip', trip_id=trip.id) }}">Delete</a>
+            </td>
         </td>
     </tr>
 </table>

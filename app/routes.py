@@ -6,7 +6,6 @@ from app.forms import LoginForm, RegistrationForm, EditProfileForm, TripForm, Co
 from app.models import User, Trip, Component, ComponentCategory, ComponentType
 
 
-
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
@@ -17,7 +16,7 @@ def index():
         db.session.add(trip)
         db.session.commit()
         flash('Your trip has been added!')
-        return redirect(url_for('index'))
+        return redirect(url_for('trip', trip_id=trip.id))
     return render_template('index.html', title='Home', form=form)
 
 @app.route('/login', methods=["GET", "POST"])
@@ -102,23 +101,37 @@ def delete_trip(trip_id: int):
     return redirect(url_for('index'))
 
 
+# TODO: Category_id and type_id are being overwritten by id 1. Fix this later
 @app.route('/component/<component_id>', methods=['GET', 'POST'])
 @login_required
 def component(component_id: int):
     component = db.first_or_404(sa.select(Component).where(Component.id == component_id))
     form = ComponentForm()
-    if form.validate_on_submit():
-        component.category_id = form.category_id.data,
-        component.type_id = form.type_id.data,
-        component.component_name = form.component_name.data,
-        component.base_cost = form.base_cost.data,
-        component.currency = form.currency.data,
-        component.description = form.description.data,
-        component.start_date = form.start_date.data,
+    # Populate category and type choices from the database
+    form.category_id.choices = [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
+    form.type_id.choices = [(t.id, t.type_name) for t in db.session.scalars(sa.select(ComponentType).where(ComponentType.category_id == form.category_id.data)).all()]
+    
+    if form.validate_on_submit(): # Update the component
+        component.category_id = form.category_id.data
+        component.type_id = form.type_id.data
+        component.component_name = form.component_name.data
+        component.base_cost = form.base_cost.data
+        component.currency = form.currency.data
+        component.description = form.description.data
+        component.start_date = form.start_date.data
         component.end_date = form.end_date.data
         db.session.commit()
         flash('Your component has been updated!')
-        return redirect(url_for('trip', component_id=component_id))
+        return redirect(url_for('trip', trip_id=component.trip_id))
+    elif request.method == 'GET': # If it's a GET, then no data has been submitted from form so we fill with the component data
+        form.category_id.data = component.category_id
+        form.type_id.data = component.type_id
+        form.component_name.data = component.component_name
+        form.base_cost.data = component.base_cost
+        form.currency.data = component.currency
+        form.description.data = component.description
+        form.start_date.data = component.start_date
+        form.end_date.data = component.end_date
     return render_template('component.html', component=component, form=form)
 
 

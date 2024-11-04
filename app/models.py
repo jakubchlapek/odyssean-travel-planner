@@ -69,12 +69,6 @@ class ComponentCategory(db.Model):
     def __repr__(self):
         return f'<Component category {self.category_name}>'
     
-@sa.event.listens_for(ComponentCategory.__table__, 'after_create')
-def create_categories(*args, **kwargs):
-    for category_name in INIT_CATEGORIES:
-        db.session.add(ComponentCategory(category_name=category_name))
-    db.session.commit()
-    
 
 class ComponentType(db.Model):    
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
@@ -86,16 +80,6 @@ class ComponentType(db.Model):
 
     def __repr__(self):
         return f'<Component type {self.type_name}, type_id {self.id}, category_id {self.category_id}>'
-    
-@sa.event.listens_for(ComponentType.__table__, 'after_create')
-def create_types(*args, **kwargs):
-    for category_name, types in INIT_TYPES.items():
-        category = db.session.scalar(
-            sa.select(ComponentCategory)
-            .where(ComponentCategory.category_name == category_name))
-        for type_name in types:
-            db.session.add(ComponentType(category_id=category.id, type_name=type_name))
-    db.session.commit()
     
 
 class Component(db.Model):    
@@ -130,3 +114,23 @@ class ExchangeRates(db.Model):
 
     def __repr__(self):
         return f'<ExchangeRate {self.currency_from} to {self.currency_to} at rate {self.rate}>'
+
+
+def populate_initial_data():
+    """Seed the database with categories and types."""
+    # Add categories
+    for category_name in INIT_CATEGORIES:
+        existing_category = db.session.query(ComponentCategory).filter_by(category_name=category_name).first()
+        if not existing_category:
+            db.session.add(ComponentCategory(category_name=category_name))
+
+    # Add types to categories
+    for category_name, types in INIT_TYPES.items():
+        category = db.session.query(ComponentCategory).filter_by(category_name=category_name).first()
+        if category:
+            for type_name in types:
+                existing_type = db.session.query(ComponentType).filter_by(category_id=category.id, type_name=type_name).first()
+                if not existing_type:
+                    db.session.add(ComponentType(category_id=category.id, type_name=type_name))
+
+    db.session.commit()
