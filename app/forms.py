@@ -8,6 +8,7 @@ from app.models import User, Trip, ExchangeRates, ComponentCategory, ComponentTy
 
 
 class LoginForm(FlaskForm):
+    """Form for logging in a user."""
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
@@ -15,6 +16,7 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
+    """Form for registering a new user."""
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -38,6 +40,7 @@ class RegistrationForm(FlaskForm):
         
 
 class EditProfileForm(FlaskForm):
+    """Form for editing user profile."""
     username = StringField('Username', validators=[DataRequired()])
     currency = StringField('Preferred currency', validators=[DataRequired(), Length(min=3, max=3)])
     submit = SubmitField('Submit')
@@ -64,6 +67,7 @@ class EditProfileForm(FlaskForm):
         
 
 class TripForm(FlaskForm):
+    """Form for adding a new trip."""
     trip_name = StringField('Trip name', validators=[DataRequired()])
     submit = SubmitField('Submit')
 
@@ -80,6 +84,7 @@ class TripForm(FlaskForm):
             raise ValidationError('Please choose a different trip name.')
         
 class ComponentForm(FlaskForm):
+    """Form for adding or editing a trip component."""
     component_name = StringField('Component name', validators=[DataRequired()])
     category_id = SelectField('Category name', choices=[], validators=[DataRequired()], default=1)
     type_id = SelectField('Type name', choices=[], coerce=int, validators=[DataRequired()])
@@ -126,4 +131,5 @@ class ComponentForm(FlaskForm):
 
 
 class EmptyForm(FlaskForm):
+    """Empty form for CSRF protection or deletes."""
     submit = SubmitField('Submit')

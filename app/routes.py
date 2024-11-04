@@ -10,6 +10,7 @@ from app.models import User, Trip, Component, ComponentCategory, ComponentType
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
+    """Home page view, where the user can add a new trip."""
     form = TripForm(user_id=current_user.id)
     if form.validate_on_submit():
         trip = Trip(user_id=current_user.id, trip_name=form.trip_name.data)
@@ -21,6 +22,7 @@ def index():
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
+    """Login page view."""
     if current_user.is_authenticated:
         return redirect(url_for("index"))
     form = LoginForm()
@@ -36,11 +38,13 @@ def login():
 
 @app.route('/logout')
 def logout():
+    """Logout route, used only for processing and a redirect."""
     logout_user()
     return redirect(url_for("index"))
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
+    """Register page view for new users."""
     if current_user.is_authenticated:
         return redirect(url_for('index'))
     form = RegistrationForm()
@@ -55,7 +59,8 @@ def register():
 
 @app.route('/user/<username>')
 @login_required
-def user(username):
+def user(username: str):
+    """User profile page view where the user can see their trips."""
     user = db.first_or_404(sa.select(User).where(User.username == username))
     trips = db.session.scalars(user.trips.select())
     return render_template('user.html', user=user, trips=trips)
@@ -63,6 +68,7 @@ def user(username):
 @app.route('/trip/<trip_id>', methods=['GET', 'POST'])
 @login_required
 def trip(trip_id: int):
+    """Trip page view where the user can see and add trip components."""
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
     form = ComponentForm()
     form.category_id.choices = [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
@@ -89,6 +95,7 @@ def trip(trip_id: int):
 @app.route('/delete_trip/<trip_id>')
 @login_required
 def delete_trip(trip_id: int):
+    """Delete trip route, used only for processing and a redirect."""
     trip = db.session.scalar(
         sa.select(Trip)
         .where(sa.and_(Trip.id == trip_id, Trip.user_id == current_user.id)))
@@ -105,6 +112,7 @@ def delete_trip(trip_id: int):
 @app.route('/component/<component_id>', methods=['GET', 'POST'])
 @login_required
 def component(component_id: int):
+    """Component page view where the user can edit a component."""
     component = db.first_or_404(sa.select(Component).where(Component.id == component_id))
     form = ComponentForm()
     # Populate category and type choices from the database
@@ -138,6 +146,7 @@ def component(component_id: int):
 @app.route('/type/<category_id>')
 @login_required
 def type(category_id: int):
+    """AJAX route to get component types based on category_id."""
     types = db.session.scalars(
         sa.select(ComponentType)
         .where(ComponentType.category_id == category_id)).all()
@@ -148,6 +157,7 @@ def type(category_id: int):
 @app.route('/delete_component/<component_id>')
 @login_required
 def delete_component(component_id: int):
+    """Delete component route, used only for processing and a redirect."""
     component = db.session.scalar(
         sa.select(Component)
         .join(Trip)
@@ -164,6 +174,7 @@ def delete_component(component_id: int):
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
+    """Edit profile page view where the user can change their username and preferred currency."""
     form = EditProfileForm(current_user.username)
     if form.validate_on_submit():
         current_user.username = form.username.data

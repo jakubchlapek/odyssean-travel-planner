@@ -18,9 +18,9 @@ if not app.debug:
     if not os.path.exists('logs'):
         os.mkdir('logs')
     file_handler = RotatingFileHandler('logs/travel_planner.log', 
-                                       maxBytes=10240, backupCount=10)
+                                       maxBytes=10240, backupCount=10) # Chose rotating file handler to limit size of log file
     file_handler.setFormatter(logging.Formatter(
-         '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+         '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')) # Format of log messages
     file_handler.setLevel(logging.INFO)
     app.logger.addHandler(file_handler)
 

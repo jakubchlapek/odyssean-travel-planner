@@ -18,6 +18,7 @@ class UserModelCase(unittest.TestCase):
         self.app_context.pop()
 
     def test_password_hashing(self):
+        """Test password hashing and checking."""
         u = User(username="traveler", email="traveler@example.com")
         u.set_password('backpack')
         self.assertNotEqual(u.password_hash, 'backpack')
@@ -25,6 +26,7 @@ class UserModelCase(unittest.TestCase):
         self.assertTrue(u.check_password('backpack'))
 
     def test_user_trip_relationship(self):
+        """Test user-trip relationship."""
         # Create mock user
         u = User(username="traveler", email="traveler@example.com")
         db.session.add(u)
@@ -41,6 +43,7 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(u_t[1].trip_name, "Scotland 2025")
 
     def test_get_total_cost_no_components(self):
+        """Test get_total_cost method for trips without components."""
         # Create mock user
         u = User(username="traveler", email="traveler@example.com")
         db.session.add(u)
@@ -53,6 +56,7 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(t.get_total_cost(), 0.0) 
 
     def test_get_total_cost_with_components(self):
+        """Test get_total_cost method for trips with components."""
         # Create mock user
         u = User(username="traveler", email="traveler@example.com")
         db.session.add(u)

@@ -9,6 +9,18 @@ from config import INIT_CATEGORIES, INIT_TYPES
 
 
 class User(UserMixin, db.Model):
+    """User model for storing user data.
+    
+    Fields:
+    - id: primary key | int
+    - username: unique username | str
+    - email: unique email | str
+    - preferred_currency: user's preferred currency as an 3-letter ICO code | str
+    - password_hash: hashed password | str
+    - created_at: timestamp of user creation | datetime
+
+    Foreign key relationships:
+    - trips: one-to-many relationship with Trip model"""
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
     email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True)
@@ -40,6 +52,17 @@ def load_user(id): # Function for flask-login
 
 
 class Trip(db.Model):
+    """Trip model for storing trip data.
+
+    Fields:
+    - id: primary key | int
+    - user_id: foreign key to User model | int
+    - trip_name: name of the trip | str
+    - created_at: timestamp of trip creation | datetime
+
+    Foreign key relationships:
+    - user: many-to-one relationship with User model
+    - components: one-to-many relationship with Component model"""
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id, name='fk_trip_user_id'), index=True)
     trip_name: so.Mapped[str] = so.mapped_column(sa.String(64))
@@ -60,6 +83,15 @@ class Trip(db.Model):
 
 
 class ComponentCategory(db.Model):    
+    """Component category model for storing component categories.
+
+    Fields:
+    - id: primary key | int
+    - category_name: unique category name | str
+
+    Foreign key relationships:
+    - component_types: one-to-many relationship with ComponentType model
+    - components: one-to-many relationship with Component model"""
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     category_name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
 
@@ -71,6 +103,16 @@ class ComponentCategory(db.Model):
     
 
 class ComponentType(db.Model):    
+    """Component type model for storing component types.
+
+    Fields:
+    - id: primary key | int
+    - category_id: foreign key to ComponentCategory model | int
+    - type_name: unique type name | str
+
+    Foreign key relationships:
+    - category: many-to-one relationship with ComponentCategory model
+    - components: one-to-many relationship with Component model"""
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     category_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(ComponentCategory.id, name='fk_component_type_category_id'), index=True)
     type_name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True)
@@ -83,6 +125,24 @@ class ComponentType(db.Model):
     
 
 class Component(db.Model):    
+    """Component model for storing trip components.
+
+    Fields:
+    - id: primary key | int
+    - trip_id: foreign key to Trip model | int
+    - category_id: foreign key to ComponentCategory model | int
+    - type_id: foreign key to ComponentType model | int
+    - component_name: name of the component | str
+    - base_cost: base cost of the component | float
+    - currency: currency of the base cost as a 3-letter ICO code | str
+    - description: description of the component | str
+    - start_date: start date of the component | datetime
+    - end_date: end date of the component | datetime
+    
+    Foreign key relationships:
+    - trip: many-to-one relationship with Trip model
+    - category: many-to-one relationship with ComponentCategory model
+    - type: many-to-one relationship with ComponentType model"""
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     trip_id: so.Mapped[int] = so.mapped_column(
         sa.ForeignKey('trip.id', name='fk_component_trip_id', ondelete='CASCADE'), index=True)
@@ -105,7 +165,15 @@ class Component(db.Model):
         return f'<Component name {self.component_name}, category {self.category_id}, type {self.type_id}, cost {self.base_cost}>'
     
 
-class ExchangeRates(db.Model):    
+class ExchangeRates(db.Model):
+    """Exchange rates model for storing currency conversion rates.
+
+    Fields:
+    - id: primary key | int
+    - currency_from: currency to convert from as a 3-letter ICO code | str
+    - currency_to: currency to convert to as a 3-letter ICO code | str
+    - rate: conversion rate | float
+    - last_updated: timestamp of last rate update | datetime"""
     id: so.Mapped[int] = so.mapped_column(sa.Integer, primary_key=True)
     currency_from: so.Mapped[str] = so.mapped_column(sa.String(3))
     currency_to: so.Mapped[str] = so.mapped_column(sa.String(3))
@@ -117,7 +185,7 @@ class ExchangeRates(db.Model):
 
 
 def populate_initial_data():
-    """Seed the database with categories and types."""
+    """Seed the database with categories and types and commit changes to session."""
     # Add categories
     for category_name in INIT_CATEGORIES:
         existing_category = db.session.query(ComponentCategory).filter_by(category_name=category_name).first()
