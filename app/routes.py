@@ -1,9 +1,9 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, TripForm, ComponentForm, EmptyForm
-from app.models import User, Trip, Component, ComponentCategory
+from app.models import User, Trip, Component, ComponentCategory, ComponentType
 
 
 
@@ -63,16 +63,16 @@ def user(username):
 
 @app.route('/trip/<trip_id>', methods=['GET', 'POST'])
 @login_required
-def trip(trip_id):
+def trip(trip_id: int):
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
     form = ComponentForm()
-    form.category_name.choices = [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
-    print(db.session.scalars(sa.select(ComponentCategory)).all())
+    form.category_id.choices = [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
+    form.type_id.choices = [(t.id, t.type_name) for t in db.session.scalars(sa.select(ComponentType).where(ComponentType.category_id == form.category_id.data)).all()]
     if form.validate_on_submit():
         component = Component(
                 trip_id = trip_id,
-                category_id = 1,
-                type_id = 1,
+                category_id = form.category_id.data,
+                type_id = form.type_id.data, 
                 component_name = form.component_name.data,
                 base_cost = form.base_cost.data,
                 currency = form.currency.data,
@@ -89,7 +89,7 @@ def trip(trip_id):
 
 @app.route('/delete_trip/<trip_id>')
 @login_required
-def delete_trip(trip_id):
+def delete_trip(trip_id: int):
     trip = db.session.scalar(
         sa.select(Trip)
         .where(sa.and_(Trip.id == trip_id, Trip.user_id == current_user.id)))
@@ -104,7 +104,7 @@ def delete_trip(trip_id):
 
 @app.route('/component/<component_id>', methods=['GET', 'POST'])
 @login_required
-def component(component_id):
+def component(component_id: int):
     component = db.first_or_404(sa.select(Component).where(Component.id == component_id))
     form = ComponentForm()
     if form.validate_on_submit():
@@ -122,9 +122,19 @@ def component(component_id):
     return render_template('component.html', component=component, form=form)
 
 
+@app.route('/type/<category_id>')
+@login_required
+def type(category_id: int):
+    types = db.session.scalars(
+        sa.select(ComponentType)
+        .where(ComponentType.category_id == category_id)).all()
+    types_list = [(t.id, t.type_name) for t in types]
+    return jsonify({'types': types_list})
+
+
 @app.route('/delete_component/<component_id>')
 @login_required
-def delete_component(component_id):
+def delete_component(component_id: int):
     component = db.session.scalar(
         sa.select(Component)
         .join(Trip)

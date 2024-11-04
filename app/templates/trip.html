@@ -19,16 +19,16 @@
             {% endfor %}
         </p>
         <p>
-            {{ form.category_name.label }}<br>
-            {{ form.category_name() }}<br>
-            {% for error in form.category_name.errors %}
+            {{ form.category_id.label }}<br>
+            {{ form.category_id() }}<br>
+            {% for error in form.category_id.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
         <p>
-            {{ form.type_name.label }}<br>
-            {{ form.type_name(size=32) }}<br>
-            {% for error in form.type_name.errors %}
+            {{ form.type_id.label }}<br>
+            {{ form.type_id() }}<br>
+            {% for error in form.type_id.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
@@ -69,4 +69,29 @@
         </p>
         <p>{{ form.submit() }}</p>
     </form>
+    <script> 
+        // Script for dynamically updating the type select based on the category select
+        let category_select = document.getElementById('category_id');
+        let type_select = document.getElementById('type_id');
+
+        // Function for updating
+        function updateTypeSelect() {
+            category_id = category_select.value;
+            fetch('/type/' + category_id).then(function(response) {
+                response.json().then(function(data) {
+                    let optionHTML = '';
+                    for (let type of data.types) {
+                        optionHTML += '<option value="' + type[0] + '">' + type[1] + '</option>'; // type[0] is the id, type[1] is the name
+                    }
+                    type_select.innerHTML = optionHTML;
+                });
+            });
+        };
+
+        // Update type options when the category changes
+        category_select.onchange = updateTypeSelect;
+        
+        // Trigger updateTypeOptions on page load to set a default type option
+        window.onload = updateTypeSelect;
+    </script>
 {% endblock %}

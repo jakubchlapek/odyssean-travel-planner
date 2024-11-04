@@ -1,10 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, DateField, DecimalField, SelectField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, NumberRange
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, NumberRange, InputRequired, Optional
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from app import db
-from app.models import User, Trip, ExchangeRates, ComponentCategory
+from app.models import User, Trip, ExchangeRates, ComponentCategory, ComponentType
 
 
 class LoginForm(FlaskForm):
@@ -81,22 +81,28 @@ class TripForm(FlaskForm):
         
 class ComponentForm(FlaskForm):
     component_name = StringField('Component name', validators=[DataRequired()])
-    category_name = SelectField('Category name', choices=[], validators=[DataRequired()])
-    type_name = StringField('Type name', validators=[DataRequired()])
-    base_cost = DecimalField('Cost', places=2, validators=[DataRequired(), NumberRange(min=0)])
+    category_id = SelectField('Category name', choices=[], validators=[DataRequired()], default=1)
+    type_id = SelectField('Type name', choices=[], coerce=int, validators=[DataRequired()])
+    base_cost = DecimalField('Cost', default=0.0, places=2, validators=[InputRequired(), NumberRange(min=0)])
     currency = StringField('Cost currency', default="PLN", validators=[Length(min=3, max=3)])
-    description = TextAreaField('Description', validators=[Length(min=0, max=140)])
-    start_date = DateField('Start date')
-    end_date = DateField('End date')
+    description = TextAreaField('Description', validators=[Length(min=0, max=140)], render_kw={"placeholder": "Describe your component here."})
+    start_date = DateField('Start date', validators=[Optional()])
+    end_date = DateField('End date', validators=[Optional()])
     submit = SubmitField('Submit')
 
-    def validate_category_name(self, category_name):
+    def validate_category_id(self, category_id):
         '''Raise a ValidationError if category not in ComponentCategory table.'''
-        #exists = db.session.scalar(sa.select(
-        #    sa.exists().where(ComponentCategory.category_name == category_name.data)))
-        exists = category_name.data in ["Transport", "Accomodation", "Entertainment"] # temporary before ComponentCategory implementation
+        exists = db.session.scalar(sa.select(
+            sa.exists().where(ComponentCategory.id == category_id.data)))
         if not exists:
             raise ValidationError('Please choose an existing category.')
+        
+    def validate_type_id(self, type_id):
+        '''Raise a ValidationError if type not in ComponentType table.'''
+        exists = db.session.scalar(sa.select(
+            sa.exists().where(ComponentType.id == type_id.data)))
+        if not exists:
+            raise ValidationError('Please choose an existing type.')
         
     def validate_currency(self, currency):
         #exists = db.session.scalar(sa.select(
@@ -112,7 +118,7 @@ class ComponentForm(FlaskForm):
         # Ensure all standard validators are met
         if rv:
             # Ensure end date >= start date
-            if self.start_date.data > self.end_date.data:
+            if self.start_date.data and self.end_date.data and (self.start_date.data > self.end_date.data):
                 self.end_date.errors.append('Finish date must be set after the starting date.')
                 return False
             return True

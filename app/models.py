@@ -85,7 +85,7 @@ class ComponentType(db.Model):
     components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='type')
 
     def __repr__(self):
-        return f'<Component category {self.category_name}>'
+        return f'<Component type {self.type_name}, type_id {self.id}, category_id {self.category_id}>'
     
 @sa.event.listens_for(ComponentType.__table__, 'after_create')
 def create_types(*args, **kwargs):
@@ -103,9 +103,9 @@ class Component(db.Model):
     trip_id: so.Mapped[int] = so.mapped_column(
         sa.ForeignKey('trip.id', name='fk_component_trip_id', ondelete='CASCADE'), index=True)
     category_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey('component_category.id', name='fk_component_category_id'), index=True, default=1)  # Category 1 is neutral
+        sa.ForeignKey('component_category.id', name='fk_component_category_id'), index=True)
     type_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey('component_type.id', name='fk_component_type_id'), index=True, default=1)
+        sa.ForeignKey('component_type.id', name='fk_component_type_id'), index=True)
     component_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     base_cost: so.Mapped[float] = so.mapped_column(sa.DECIMAL(10, 2))
     currency: so.Mapped[str] = so.mapped_column(sa.String(3))
@@ -118,7 +118,7 @@ class Component(db.Model):
     type: so.Mapped[ComponentType] = so.relationship(back_populates='components')
 
     def __repr__(self):
-        return f'<Component name {self.component_name}, cost {self.base_cost}>'
+        return f'<Component name {self.component_name}, category {self.category_id}, type {self.type_id}, cost {self.base_cost}>'
     
 
 class ExchangeRates(db.Model):    
