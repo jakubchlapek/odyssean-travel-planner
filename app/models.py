@@ -2,10 +2,10 @@ import sqlalchemy as sa
 import sqlalchemy.orm as so
 from datetime import datetime, timezone
 from typing import Optional
+from config import Config
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin # Adds safe implementations of 4 elements (is_authenticated, get_id(), etc...)
 from app import db, login
-from config import INIT_CATEGORIES, INIT_TYPES
 
 
 class User(UserMixin, db.Model):
@@ -187,13 +187,13 @@ class ExchangeRates(db.Model):
 def populate_initial_data():
     """Seed the database with categories and types and commit changes to session."""
     # Add categories
-    for category_name in INIT_CATEGORIES:
+    for category_name in Config.INIT_CATEGORIES:
         existing_category = db.session.query(ComponentCategory).filter_by(category_name=category_name).first()
         if not existing_category:
             db.session.add(ComponentCategory(category_name=category_name))
 
     # Add types to categories
-    for category_name, types in INIT_TYPES.items():
+    for category_name, types in Config.INIT_TYPES.items():
         category = db.session.query(ComponentCategory).filter_by(category_name=category_name).first()
         if category:
             for type_name in types:
@@ -202,3 +202,4 @@ def populate_initial_data():
                     db.session.add(ComponentType(category_id=category.id, type_name=type_name))
 
     db.session.commit()
+

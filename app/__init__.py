@@ -29,6 +29,10 @@ if not app.debug:
 
 from app import routes, models, errors
 
-with app.app_context():
-    models.populate_initial_data()  # Populate tables with initial data
+@app.cli.command('seed')
+def seed():
+    """Command line command for populating the database with initial data."""
+    with app.app_context():
+        models.populate_initial_data()
+        print("Database seeded with initial data.")
 
