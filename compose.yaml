@@ -10,12 +10,12 @@ services:
       - FLASK_APP=travel-planner.py
       - FLASK_ENV=development
       - DATABASE_URL=mysql+pymysql://travel-db:viceversa0311@db/travel-db
-      # - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
     ports:
       - "5000:5000"
     depends_on:
       - db
-      # - elasticsearch
+      - elasticsearch
 
     networks:
       - travel-network
@@ -35,22 +35,22 @@ services:
     networks:
       - travel-network
 
-  # elasticsearch:
-  #   image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
-  #   environment:
-  #     - discovery.type=single-node
-  #     - ES_JAVA_OPTS=-Xms512m -Xmx512m  # Set Java memory options to avoid memory issues
-  #     - xpack.security.enabled=false  # Disable security features for development
-  #   ports:
-  #     - "9200:9200"
-  #   volumes:
-  #     - es_data:/usr/share/elasticsearch/data
-  #   networks:
-  #     - travel-network
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m  # Set Java memory options to avoid memory issues
+      - xpack.security.enabled=false  # Disable security features for development
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - travel-network
 
 volumes:
   db_data:
-  # es_data:
+  es_data:
 
 networks:
   travel-network: 
