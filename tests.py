@@ -66,8 +66,8 @@ class UserModelCase(unittest.TestCase):
         db.session.add(t)
         db.session.commit()
         # Add 2 components
-        c1 = Component(trip=t, component_name="Hotel Eiffel Tower", base_cost=200.00, currency="PLN")
-        c2 = Component(trip=t, component_name="Flight to Paris", base_cost=300.00, currency="PLN")
+        c1 = Component(trip=t, category_id = 1, type_id = 1, component_name="Hotel Eiffel Tower", base_cost=200.00, currency="PLN")
+        c2 = Component(trip=t, category_id = 1, type_id = 1, component_name="Flight to Paris", base_cost=300.00, currency="PLN")
         db.session.add_all([c1, c2])
         db.session.commit()
         # Trip with components should calculate total cost correctly

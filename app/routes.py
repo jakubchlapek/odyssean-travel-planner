@@ -82,6 +82,7 @@ def trip(trip_id: int):
                 base_cost = form.base_cost.data,
                 currency = form.currency.data,
                 description = form.description.data,
+                link = form.link.data,
                 start_date = form.start_date.data,
                 end_date = form.end_date.data,)
         db.session.add(component)
@@ -126,6 +127,7 @@ def component(component_id: int):
         component.base_cost = form.base_cost.data
         component.currency = form.currency.data
         component.description = form.description.data
+        component.link = form.link.data
         component.start_date = form.start_date.data
         component.end_date = form.end_date.data
         db.session.commit()
@@ -138,6 +140,7 @@ def component(component_id: int):
         form.base_cost.data = component.base_cost
         form.currency.data = component.currency
         form.description.data = component.description
+        form.link.data = component.link
         form.start_date.data = component.start_date
         form.end_date.data = component.end_date
     return render_template('component.html', component=component, form=form)

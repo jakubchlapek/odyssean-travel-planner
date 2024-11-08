@@ -15,8 +15,8 @@ class User(UserMixin, db.Model):
     - id: primary key | int
     - username: unique username | str
     - email: unique email | str
-    - preferred_currency: user's preferred currency as an 3-letter ICO code | str
-    - password_hash: hashed password | str
+    - preferred_currency: user's preferred currency as an 3-letter ICO code | str 
+    - password_hash: hashed password | str 
     - created_at: timestamp of user creation | datetime
 
     Foreign key relationships:
@@ -135,9 +135,10 @@ class Component(db.Model):
     - component_name: name of the component | str
     - base_cost: base cost of the component | float
     - currency: currency of the base cost as a 3-letter ICO code | str
-    - description: description of the component | str
-    - start_date: start date of the component | datetime
-    - end_date: end date of the component | datetime
+    - description: description of the component | str | optional
+    - link: URL to the component | str | optional
+    - start_date: start date of the component | datetime | optional
+    - end_date: end date of the component | datetime | optional
     
     Foreign key relationships:
     - trip: many-to-one relationship with Trip model
@@ -154,6 +155,7 @@ class Component(db.Model):
     base_cost: so.Mapped[float] = so.mapped_column(sa.DECIMAL(10, 2))
     currency: so.Mapped[str] = so.mapped_column(sa.String(3))
     description: so.Mapped[Optional[str]] = so.mapped_column(sa.Text)
+    link: so.Mapped[Optional[str]] = so.mapped_column(sa.String(2083)) # lowest common denominator for URL length
     start_date: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime)
     end_date: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime)
 

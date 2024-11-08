@@ -91,6 +91,7 @@ class ComponentForm(FlaskForm):
     base_cost = DecimalField('Cost', default=0.0, places=2, validators=[InputRequired(), NumberRange(min=0)])
     currency = StringField('Cost currency', default="PLN", validators=[Length(min=3, max=3)])
     description = TextAreaField('Description', validators=[Length(min=0, max=140)], render_kw={"placeholder": "Describe your component here."})
+    link = StringField('Link', validators=[Length(min=0, max=2083)], render_kw={"placeholder": "Add a link to your component."})
     start_date = DateField('Start date', validators=[Optional()])
     end_date = DateField('End date', validators=[Optional()])
     submit = SubmitField('Submit')

@@ -2,6 +2,7 @@
 
 {% block content %}
     <h1>Component: {{ component.component_name }}</h1>
+    <a href="{{ url_for('trip', trip_id=component.trip_id)}}">Back</a>&emsp;
     <a href="{{ url_for('delete_component', component_id=component.id) }}">Delete component</a>
     <h2>Edit component</h2>
     {% include '_edit_component.html' %}
