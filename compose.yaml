@@ -2,13 +2,14 @@ name: travel-planner
 
 services:
   app:
+    container_name: travel-planner
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       - FLASK_APP=travel-planner.py
       - FLASK_ENV=development
-      - DATABASE_URL=mysql+pymysql://travel-db:viceversa0311@mysql/travel-db
+      - DATABASE_URL=mysql+pymysql://travel-db:viceversa0311@db/travel-db
       # - ELASTICSEARCH_URL=http://elasticsearch:9200
     ports:
       - "5000:5000"
@@ -21,6 +22,7 @@ services:
 
   db:
     image: mysql:9.1
+    container_name: travel-db
     environment:
       MYSQL_DATABASE: travel-db
       MYSQL_USER: travel-db
@@ -51,5 +53,5 @@ volumes:
   # es_data:
 
 networks:
-  travel-network:
+  travel-network: 
     driver: bridge
