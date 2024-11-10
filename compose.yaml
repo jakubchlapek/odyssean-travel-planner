@@ -9,7 +9,7 @@ services:
     environment:
       - FLASK_APP=travel-planner.py
       - FLASK_ENV=development
-      - DATABASE_URL=mysql+pymysql://travel-db:${DATABASE_PASSWORD}@db/travel-db
+      - DATABASE_URL=mysql+pymysql://travel-db:${DATABASE_PASSWORD}@db:3306/travel-db
       - ELASTICSEARCH_URL=http://elasticsearch:9200
     ports:
       - "5000:5000"
@@ -21,7 +21,7 @@ services:
       - travel-network
 
   db:
-    image: mysql:9.1
+    image: mysql:5.7 # using 5.7 becuase of issues with sha2 authentication in later versions
     container_name: travel-db
     environment:
       MYSQL_DATABASE: travel-db

@@ -9,9 +9,9 @@ while true; do
         break
     fi
     echo Upgrade command failed, retrying in 5 secs...
-    echo "Database URL: $DATABASE_URL" #debug
     sleep 5
 done
+echo "Flask migration successful!"
 
 echo "Seeding the database..."
 flask seed
