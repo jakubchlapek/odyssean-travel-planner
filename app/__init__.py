@@ -27,6 +27,8 @@ if not app.debug:
     app.logger.setLevel(logging.INFO)
     app.logger.info('Starting up Travel Planner!')
 
+from app.plotlydash.dashboard import init_dash_app
+app = init_dash_app(app)
 from app import routes, models, errors
 
 @app.cli.command('seed')

@@ -93,22 +93,6 @@ def trip(trip_id: int):
     return render_template('trip.html', trip=trip, components=components, form=form)
 
 
-@app.route('/delete_trip/<trip_id>')
-@login_required
-def delete_trip(trip_id: int):
-    """Delete trip route, used only for processing and a redirect."""
-    trip = db.session.scalar(
-        sa.select(Trip)
-        .where(sa.and_(Trip.id == trip_id, Trip.user_id == current_user.id)))
-    if trip is None:
-        flash("Trip not found or you do not have permission to delete it.")
-        return redirect(url_for('index'))
-    db.session.delete(trip)
-    db.session.commit()
-    flash("Trip deleted successfully.")
-    return redirect(url_for('index'))
-
-
 # TODO: Category_id and type_id are being overwritten by id 1. Fix this later
 @app.route('/component/<component_id>', methods=['GET', 'POST'])
 @login_required
@@ -132,7 +116,6 @@ def component(component_id: int):
         component.end_date = form.end_date.data
         db.session.commit()
         flash('Your component has been updated!')
-        return redirect(url_for('trip', trip_id=component.trip_id))
     elif request.method == 'GET': # If it's a GET, then no data has been submitted from form so we fill with the component data
         form.category_id.data = component.category_id
         form.type_id.data = component.type_id
@@ -157,22 +140,39 @@ def type(category_id: int):
     return jsonify({'types': types_list})
 
 
-@app.route('/delete_component/<component_id>')
+@app.route('/delete_trip/<trip_id>', methods=['POST'])
+@login_required
+def delete_trip(trip_id: int):
+    """AJAX route for processing the deletion in JS scripts."""
+    trip = db.session.scalar(
+        sa.select(Trip)
+        .where(sa.and_(Trip.id == trip_id, Trip.user_id == current_user.id))
+    )
+    if trip is None:
+        return jsonify({"success": False, "message": "Trip not found or you do not have permission to delete it."}), 404
+
+    db.session.delete(trip)
+    db.session.commit()
+    return jsonify({"success": True, "message": "Trip deleted successfully."}), 200
+
+
+
+@app.route('/delete_component/<component_id>', methods=['POST'])
 @login_required
 def delete_component(component_id: int):
-    """Delete component route, used only for processing and a redirect."""
+    """AJAX route for processing the deletion in JS."""
     component = db.session.scalar(
         sa.select(Component)
         .join(Trip)
         .where(sa.and_(Component.id == component_id, Trip.user_id == current_user.id)))
     if component is None:
-        flash("Component not found or you do not have permission to delete it.")
-        return redirect(url_for('index'))
+        return jsonify({"success": False, "message": "Component not found or you do not have permission to delete it."}), 404
+
     trip_id = component.trip_id
     db.session.delete(component)
     db.session.commit()
-    flash("Component deleted successfully.")
-    return redirect(url_for('trip', trip_id=trip_id))
+    return jsonify({"success": True, "trip_id": trip_id, "message": "Component deleted successfully."}), 200
+
 
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
@@ -189,3 +189,4 @@ def edit_profile():
         form.username.data = current_user.username
         form.currency.data = current_user.preferred_currency
     return render_template('edit_profile.html', title='Edit Profile', form=form)
+

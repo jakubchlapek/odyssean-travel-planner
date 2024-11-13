@@ -1,6 +1,8 @@
 <!doctype html>
 <html>
     <head>
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+      <script src="{{ url_for('static', filename='js/delete_scripts.js') }}"></script>
       {% if title %}
       <title>{{ title }} - Travel Planner</title>
       {% else %}

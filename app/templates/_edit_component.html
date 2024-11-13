@@ -64,7 +64,7 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        <p>{{ form.submit() }}</p>
+        <p>{{ form.submit(onclick="reloadParent()") }}</p>
     </form>
     <script> 
         // Script for dynamically updating the type select based on the category select
@@ -94,3 +94,5 @@
         }        
     </script>
 {% endblock %}
+
+<script src="{{ url_for('static', filename='js/delete_scripts.js') }}"></script>

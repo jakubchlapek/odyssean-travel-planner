@@ -3,10 +3,19 @@
 {% block content %}
     <h1>Trip: {{ trip.trip_name }}</h1>
     Cost: {{ trip.get_total_cost() }}<br>
-    <a href="{{ url_for('delete_trip', trip_id=trip.id) }}">Delete trip</a>
+    <a id="delete" href="#" onclick="deleteTrip(
+        {{ trip.id|tojson }}, reload=false)">Delete trip</a> <!--I call |tojson so JS knows it's safe and reload=false as I want to redirect-->
+    <iframe src="/dash/{{ trip.id }}" style="width:100%; height:80vh; border:none;"> <!-- Hardcoded because its a dash endpoint, not flask-->
+        Your browser does not support iframes.
+    </iframe>
     <h2>Trip components</h2>
     {% for component in components %}
-        {% include '_component.html' %}
+        <!-- {% include '_component.html' %} -->
+        <div>
+            <iframe src="{{url_for('component', component_id=component.id)}}">
+                Your browser does not support iframes.
+            </iframe>
+        </div>
     {% endfor %}
     <h2>Add component</h2>
     {% include '_edit_component.html' %}
