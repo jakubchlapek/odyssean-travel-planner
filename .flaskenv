@@ -1,2 +1,2 @@
 FLASK_APP=travel-planner.py
-FLASK_DEBUG=1
+FLASK_DEBUG=0

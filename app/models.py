@@ -17,7 +17,7 @@ class User(UserMixin, db.Model):
     - email: unique email | str
     - preferred_currency: user's preferred currency as an 3-letter ICO code | str 
     - password_hash: hashed password | str 
-    - created_at: timestamp of user creation | datetime
+    - created_at: timestamp of user creation | timestamp
 
     Foreign key relationships:
     - trips: one-to-many relationship with Trip model"""
@@ -27,7 +27,7 @@ class User(UserMixin, db.Model):
     preferred_currency: so.Mapped[Optional[str]] = so.mapped_column(sa.String(3), default="PLN")
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     created_at: so.Mapped[datetime] = so.mapped_column(
-        index=True, default=lambda: datetime.now(timezone.utc))
+        sa.TIMESTAMP, index=True, default=lambda: datetime.now(timezone.utc))
     
     trips: so.WriteOnlyMapped['Trip'] = so.relationship(back_populates='user')
 
@@ -58,7 +58,7 @@ class Trip(db.Model):
     - id: primary key | int
     - user_id: foreign key to User model | int
     - trip_name: name of the trip | str
-    - created_at: timestamp of trip creation | datetime
+    - created_at: timestamp of trip creation | timestamp
 
     Foreign key relationships:
     - user: many-to-one relationship with User model
@@ -67,7 +67,7 @@ class Trip(db.Model):
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey(User.id, name='fk_trip_user_id'), index=True)
     trip_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     created_at: so.Mapped[datetime] = so.mapped_column(
-        index=True, default=lambda: datetime.now(timezone.utc))
+        sa.TIMESTAMP, index=True, default=lambda: datetime.now(timezone.utc))
     
     user: so.Mapped[User] = so.relationship(back_populates='trips')
     components: so.WriteOnlyMapped['Component'] = so.relationship(cascade='all, delete', back_populates='trip', passive_deletes=True)
@@ -137,8 +137,8 @@ class Component(db.Model):
     - currency: currency of the base cost as a 3-letter ICO code | str
     - description: description of the component | str | optional
     - link: URL to the component | str | optional
-    - start_date: start date of the component | datetime | optional
-    - end_date: end date of the component | datetime | optional
+    - start_date: start date of the component | timestamp | optional
+    - end_date: end date of the component | timestamp | optional
     
     Foreign key relationships:
     - trip: many-to-one relationship with Trip model
@@ -156,8 +156,8 @@ class Component(db.Model):
     currency: so.Mapped[str] = so.mapped_column(sa.String(3))
     description: so.Mapped[Optional[str]] = so.mapped_column(sa.Text)
     link: so.Mapped[Optional[str]] = so.mapped_column(sa.String(2083)) # lowest common denominator for URL length
-    start_date: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime)
-    end_date: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime)
+    start_date: so.Mapped[Optional[datetime]] = so.mapped_column(sa.TIMESTAMP)
+    end_date: so.Mapped[Optional[datetime]] = so.mapped_column(sa.TIMESTAMP)
 
     trip: so.Mapped[Trip] = so.relationship(back_populates='components')
     category: so.Mapped[ComponentCategory] = so.relationship(back_populates='components')
@@ -174,10 +174,10 @@ class ExchangeRates(db.Model):
     Fields:
     - currency_to: currency to convert to as a 3-letter ICO code | primary key | str
     - rate: conversion rate | float
-    - last_updated: timestamp of last rate update | datetime"""
+    - last_updated: timestamp of last rate update | timestamp"""
     currency_to: so.Mapped[str] = so.mapped_column(sa.String(3), primary_key=True)
     rate: so.Mapped[float] = so.mapped_column(sa.DECIMAL(18, 9))  # Conversion rate
-    last_updated: so.Mapped[datetime] = so.mapped_column(default=datetime.now(timezone.utc))
+    last_updated: so.Mapped[datetime] = so.mapped_column(sa.TIMESTAMP, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     def __repr__(self):
         return f'<ExchangeRate PLN to {self.currency_to} at rate {self.rate}>'

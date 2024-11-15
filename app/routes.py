@@ -16,6 +16,7 @@ def index():
         trip = Trip(user_id=current_user.id, trip_name=form.trip_name.data)
         db.session.add(trip)
         db.session.commit()
+        app.logger.info(f"User {current_user.username}, id: {current_user.id} added a new trip: {form.trip_name.data}, id: {trip.id}.")
         flash('Your trip has been added!')
         return redirect(url_for('trip', trip_id=trip.id))
     return render_template('index.html', title='Home', form=form)
@@ -30,15 +31,18 @@ def login():
         user = db.session.scalar(
             sa.select(User).where(User.username == form.username.data))
         if user is None or not user.check_password(form.password.data):
+            app.logger.warning(f"Failed login attempt for user {form.username.data}")
             flash("Invalid username or password")
             return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
+        app.logger.info(f"User {user.username}, id: {user.id} logged in successfully.")
         return redirect(url_for('index'))
     return render_template('login.html', title="Login", form=form)
 
 @app.route('/logout')
 def logout():
     """Logout route, used only for processing and a redirect."""
+    app.logger.info(f"User {current_user.username}, id {current_user.id} logged out.")
     logout_user()
     return redirect(url_for("index"))
 
@@ -53,6 +57,7 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+        app.logger.info(f"New user registered: {form.username.data}, id: {user.id}")
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
@@ -63,6 +68,7 @@ def user(username: str):
     """User profile page view where the user can see their trips."""
     user = db.first_or_404(sa.select(User).where(User.username == username))
     trips = db.session.scalars(user.trips.select())
+    app.logger.info(f"User {current_user.username}, id: {current_user.id} viewed user's {username} profile.")
     return render_template('user.html', user=user, trips=trips)
 
 @app.route('/trip/<trip_id>', methods=['GET', 'POST'])
@@ -88,6 +94,7 @@ def trip(trip_id: int):
                 end_date = form.end_date.data,)
         db.session.add(component)
         db.session.commit()
+        app.logger.info(f"User {current_user.username} added a new component to trip {trip.trip_name}, id: {trip_id}.")
         flash('Your component has been added!')
         return redirect(url_for('trip', trip_id=trip_id))
     components = db.session.scalars(trip.components.select())
@@ -117,6 +124,7 @@ def component(component_id: int):
         component.start_date = form.start_date.data
         component.end_date = form.end_date.data
         db.session.commit()
+        app.logger.info(f"User {current_user.username} edited the component {component.component_name}, id: {component.id}.")
         flash('Your component has been updated!')
     elif request.method == 'GET': # If it's a GET, then no data has been submitted from form so we fill with the component data
         form.category_id.data = component.category_id
@@ -151,10 +159,12 @@ def delete_trip(trip_id: int):
         .where(sa.and_(Trip.id == trip_id, Trip.user_id == current_user.id))
     )
     if trip is None:
+        app.logger.warning(f"User {current_user.username} tried to delete a non-existing or unauthorized trip {trip_id}")
         return jsonify({"success": False, "message": "Trip not found or you do not have permission to delete it."}), 404
 
     db.session.delete(trip)
     db.session.commit()
+    app.logger.info(f"User {current_user.username} deleted trip {trip_id} successfully.")
     return jsonify({"success": True, "message": "Trip deleted successfully."}), 200
 
 
@@ -168,11 +178,13 @@ def delete_component(component_id: int):
         .join(Trip)
         .where(sa.and_(Component.id == component_id, Trip.user_id == current_user.id)))
     if component is None:
+        app.logger.warning(f"User {current_user.username}, id: {current_user.id} tried to delete a non-existing or unauthorized component {component_id}")
         return jsonify({"success": False, "message": "Component not found or you do not have permission to delete it."}), 404
 
     trip_id = component.trip_id
     db.session.delete(component)
     db.session.commit()
+    app.logger.info(f"User {current_user.username}, id: {current_user.id} deleted component id: {component_id} from trip id: {trip_id}.")
     return jsonify({"success": True, "trip_id": trip_id, "message": "Component deleted successfully."}), 200
 
 
@@ -186,6 +198,7 @@ def edit_profile():
         current_user.username = form.username.data
         current_user.preferred_currency = form.currency.data
         db.session.commit()
+        app.logger.info(f"User {current_user.username}, id: {current_user.id} updated their profile.")
         flash("Your changes have been saved.")
         return redirect(url_for('edit_profile'))
     elif request.method == 'GET':

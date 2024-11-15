@@ -1,5 +1,5 @@
 import pandas as pd
-from app import db
+from app import app, db
 from app.models import Component, Trip
 from config import Config
 import sqlalchemy as sa
@@ -10,6 +10,7 @@ type_names = {i + 1: type_name for i, type_name in enumerate({type_ for types in
 
 def fetch_data(trip_id: int):
     """Fetch components list and trip name from the database, run it to create_dataframe and return it."""
+    app.logger.info(f"Fetching data for trip id: {trip_id}.")
     if not trip_id or not isinstance(trip_id, int):
         return None
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
@@ -20,6 +21,7 @@ def fetch_data(trip_id: int):
 
 def data_to_dict(components: list[Component], trip_name: str, trip_total_cost: float) -> dict:
     """Create a dictionary created from a list of components."""
+    app.logger.info(f"Creating dictionary from components list for trip: {trip_name}.")
     if not components:
         return dict()
     

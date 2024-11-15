@@ -21,10 +21,10 @@ if not app.debug:
                                        maxBytes=10240, backupCount=10) # Chose rotating file handler to limit size of log file
     file_handler.setFormatter(logging.Formatter(
          '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')) # Format of log messages
-    file_handler.setLevel(logging.INFO)
+    file_handler.setLevel(logging.DEBUG)
     app.logger.addHandler(file_handler)
 
-    app.logger.setLevel(logging.INFO)
+    app.logger.setLevel(logging.DEBUG)
     app.logger.info('Starting up Travel Planner!')
 
 from app.plotlydash.dashboard import init_dash_app

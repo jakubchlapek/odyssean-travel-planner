@@ -16,6 +16,11 @@ echo "Flask migration successful!"
 echo "Seeding the database..."
 flask seed
 echo "Updating the exchange rates..."
-flask update_exchange_rates
+if [[ "$?" == "0" ]]; then
+    echo "Exchange rates updated successfully."
+else
+    echo "Exchange rates are already up to date."
+fi
+
 echo "Starting Flask application..."
 flask run

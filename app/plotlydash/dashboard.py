@@ -7,6 +7,7 @@ from app.plotlydash.data import fetch_data
 def init_dash_app(server):
     # Initialize Dash app with the parent Flask app 
     # With this setup Dash piggybacks off of the Flask server as a module, opposed to running as a standalone server
+    server.logger.info("Initializing Dash app.")
     dash_app = dash.Dash(
         server=server,
         routes_pathname_prefix='/dash/',
@@ -20,7 +21,7 @@ def init_dash_app(server):
         dash.dcc.Store(id="data-store"),  # Store to hold fetched data
         dash.dcc.Graph(id='budget-graph') 
     ])
-
+    
     init_callbacks(dash_app)
 
     return dash_app.server
