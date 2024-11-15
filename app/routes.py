@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, EditProfileForm, TripForm, ComponentForm, EmptyForm
-from app.models import User, Trip, Component, ComponentCategory, ComponentType
+from app.models import User, Trip, Component, ComponentCategory, ComponentType, ExchangeRates
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -73,6 +73,7 @@ def trip(trip_id: int):
     form = ComponentForm()
     form.category_id.choices = [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
     form.type_id.choices = [(t.id, t.type_name) for t in db.session.scalars(sa.select(ComponentType).where(ComponentType.category_id == form.category_id.data)).all()]
+    form.currency.choices = [(e.currency_to, e.currency_to) for e in db.session.scalars(sa.select(ExchangeRates)).all()]
     if form.validate_on_submit():
         component = Component(
                 trip_id = trip_id,
@@ -103,7 +104,8 @@ def component(component_id: int):
     # Populate category and type choices from the database
     form.category_id.choices = [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
     form.type_id.choices = [(t.id, t.type_name) for t in db.session.scalars(sa.select(ComponentType).where(ComponentType.category_id == form.category_id.data)).all()]
-    
+    form.currency.choices = [(e.currency_to, e.currency_to) for e in db.session.scalars(sa.select(ExchangeRates)).all()]
+
     if form.validate_on_submit(): # Update the component
         component.category_id = form.category_id.data
         component.type_id = form.type_id.data
@@ -179,6 +181,7 @@ def delete_component(component_id: int):
 def edit_profile():
     """Edit profile page view where the user can change their username and preferred currency."""
     form = EditProfileForm(current_user.username)
+    form.currency.choices = [(e.currency_to, e.currency_to) for e in db.session.scalars(sa.select(ExchangeRates)).all()]
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.preferred_currency = form.currency.data

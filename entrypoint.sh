@@ -15,5 +15,7 @@ echo "Flask migration successful!"
 
 echo "Seeding the database..."
 flask seed
+echo "Updating the exchange rates..."
+flask update_exchange_rates
 echo "Starting Flask application..."
 flask run

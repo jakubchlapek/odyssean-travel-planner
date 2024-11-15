@@ -168,22 +168,19 @@ class Component(db.Model):
     
 
 class ExchangeRates(db.Model):
-    """Exchange rates model for storing currency conversion rates.
+    """Exchange rates model for storing currency conversion rates. It stores rates from PLN to other currencies, 
+    from which other rates can be calculated (to limit the memory taken up in the database).
 
     Fields:
-    - id: primary key | int
-    - currency_from: currency to convert from as a 3-letter ICO code | str
-    - currency_to: currency to convert to as a 3-letter ICO code | str
+    - currency_to: currency to convert to as a 3-letter ICO code | primary key | str
     - rate: conversion rate | float
     - last_updated: timestamp of last rate update | datetime"""
-    id: so.Mapped[int] = so.mapped_column(sa.Integer, primary_key=True)
-    currency_from: so.Mapped[str] = so.mapped_column(sa.String(3))
-    currency_to: so.Mapped[str] = so.mapped_column(sa.String(3))
-    rate: so.Mapped[float] = so.mapped_column(sa.DECIMAL(10, 6))  # Conversion rate
+    currency_to: so.Mapped[str] = so.mapped_column(sa.String(3), primary_key=True)
+    rate: so.Mapped[float] = so.mapped_column(sa.DECIMAL(18, 9))  # Conversion rate
     last_updated: so.Mapped[datetime] = so.mapped_column(default=datetime.now(timezone.utc))
 
     def __repr__(self):
-        return f'<ExchangeRate {self.currency_from} to {self.currency_to} at rate {self.rate}>'
+        return f'<ExchangeRate PLN to {self.currency_to} at rate {self.rate}>'
 
 
 def populate_initial_data():

@@ -31,6 +31,13 @@ from app.plotlydash.dashboard import init_dash_app
 app = init_dash_app(app)
 from app import routes, models, errors
 
+@app.cli.command('update_exchange_rates')
+def update_exchange_rates_command():
+    """Command line command for updating exchange rates."""
+    from app.exchange_rates.rates import update_exchange_rates
+    update_exchange_rates()
+    print("Exchange rates updated.")
+    
 @app.cli.command('seed')
 def seed():
     """Command line command for populating the database with initial data."""

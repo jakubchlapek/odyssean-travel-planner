@@ -42,7 +42,7 @@ class RegistrationForm(FlaskForm):
 class EditProfileForm(FlaskForm):
     """Form for editing user profile."""
     username = StringField('Username', validators=[DataRequired()])
-    currency = StringField('Preferred currency', validators=[DataRequired(), Length(min=3, max=3)])
+    currency = SelectField('Preferred currency', choices=[], validators=[DataRequired(), Length(min=3, max=3)])
     submit = SubmitField('Submit')
 
     def __init__(self, original_username, *args, **kwargs):
@@ -59,9 +59,8 @@ class EditProfileForm(FlaskForm):
             
     def validate_currency(self, currency):
         '''Raise a ValidationError if currency not in ExchangeRates table.'''
-        #exists = db.session.scalar(sa.select(
-        #    sa.exists().where(ExchangeRates.currency_from == currency.data)))
-        exists = currency in ["PLN", "EUR", "USD"] # temporary before exchangerates implementation
+        exists = db.session.scalar(sa.select(
+            sa.exists().where(ExchangeRates.currency_to == currency.data)))
         if not exists:
             raise ValidationError('Please choose an existing currency.')
         
@@ -89,7 +88,7 @@ class ComponentForm(FlaskForm):
     category_id = SelectField('Category name', choices=[], validators=[DataRequired()], default=1)
     type_id = SelectField('Type name', choices=[], coerce=int, validators=[DataRequired()])
     base_cost = DecimalField('Cost', default=0.0, places=2, validators=[InputRequired(), NumberRange(min=0)])
-    currency = StringField('Cost currency', default="PLN", validators=[Length(min=3, max=3)])
+    currency = SelectField('Cost currency', choices=[], default="PLN", validators=[Length(min=3, max=3)])
     description = TextAreaField('Description', validators=[Length(min=0, max=140)], render_kw={"placeholder": "Describe your component here."})
     link = StringField('Link', validators=[Length(min=0, max=2083)], render_kw={"placeholder": "Add a link to your component."})
     start_date = DateField('Start date', validators=[Optional()])
@@ -111,9 +110,8 @@ class ComponentForm(FlaskForm):
             raise ValidationError('Please choose an existing type.')
         
     def validate_currency(self, currency):
-        #exists = db.session.scalar(sa.select(
-        #    sa.exists().where(ExchangeRates.currency_from == currency.data)))
-        exists = currency.data in ["PLN", "EUR", "USD"] # temporary before ExchangeRates implementation
+        exists = db.session.scalar(sa.select(
+            sa.exists().where(ExchangeRates.currency_to == currency.data)))
         if not exists:
             raise ValidationError('Please choose an existing currency.')
 
