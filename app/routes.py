@@ -6,6 +6,21 @@ from app.forms import LoginForm, RegistrationForm, EditProfileForm, TripForm, Co
 from app.models import User, Trip, Component, ComponentCategory, ComponentType, ExchangeRates
 
 
+# Helper functions
+def get_category_choices():
+    return [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
+
+def get_type_choices(category_id=None):
+    query = sa.select(ComponentType)
+    if category_id:
+        query = query.where(ComponentType.category_id == category_id)
+    return [(t.id, t.type_name) for t in db.session.scalars(query).all()]
+
+def get_currency_choices():
+    return [(e.currency_to, e.currency_to) for e in db.session.scalars(sa.select(ExchangeRates)).all()]
+
+
+# Routes
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
@@ -20,6 +35,7 @@ def index():
         flash('Your trip has been added!')
         return redirect(url_for('trip', trip_id=trip.id))
     return render_template('index.html', title='Home', form=form)
+
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
@@ -39,12 +55,14 @@ def login():
         return redirect(url_for('index'))
     return render_template('login.html', title="Login", form=form)
 
+
 @app.route('/logout')
 def logout():
     """Logout route, used only for processing and a redirect."""
     app.logger.info(f"User {current_user.username}, id {current_user.id} logged out.")
     logout_user()
     return redirect(url_for("index"))
+
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -62,6 +80,7 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
+
 @app.route('/user/<username>')
 @login_required
 def user(username: str):
@@ -71,15 +90,16 @@ def user(username: str):
     app.logger.info(f"User {current_user.username}, id: {current_user.id} viewed user's {username} profile.")
     return render_template('user.html', user=user, trips=trips)
 
+
 @app.route('/trip/<trip_id>', methods=['GET', 'POST'])
 @login_required
 def trip(trip_id: int):
     """Trip page view where the user can see and add trip components."""
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
     form = ComponentForm()
-    form.category_id.choices = [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
-    form.type_id.choices = [(t.id, t.type_name) for t in db.session.scalars(sa.select(ComponentType).where(ComponentType.category_id == form.category_id.data)).all()]
-    form.currency.choices = [(e.currency_to, e.currency_to) for e in db.session.scalars(sa.select(ExchangeRates)).all()]
+    form.category_id.choices = get_category_choices()
+    form.type_id.choices = get_type_choices(category_id=form.category_id.data)
+    form.currency.choices = get_currency_choices()
     if form.validate_on_submit():
         component = Component(
                 trip_id = trip_id,
@@ -109,9 +129,9 @@ def component(component_id: int):
     component = db.first_or_404(sa.select(Component).where(Component.id == component_id))
     form = ComponentForm()
     # Populate category and type choices from the database
-    form.category_id.choices = [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
-    form.type_id.choices = [(t.id, t.type_name) for t in db.session.scalars(sa.select(ComponentType).where(ComponentType.category_id == form.category_id.data)).all()]
-    form.currency.choices = [(e.currency_to, e.currency_to) for e in db.session.scalars(sa.select(ExchangeRates)).all()]
+    form.category_id.choices = get_category_choices()
+    form.type_id.choices = get_type_choices(category_id=form.category_id.data)
+    form.currency.choices = get_currency_choices()
 
     if form.validate_on_submit(): # Update the component
         component.category_id = form.category_id.data
@@ -193,7 +213,7 @@ def delete_component(component_id: int):
 def edit_profile():
     """Edit profile page view where the user can change their username and preferred currency."""
     form = EditProfileForm(current_user.username)
-    form.currency.choices = [(e.currency_to, e.currency_to) for e in db.session.scalars(sa.select(ExchangeRates)).all()]
+    form.currency.choices = get_currency_choices()
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.preferred_currency = form.currency.data
