@@ -5,7 +5,8 @@ from typing import Optional
 from config import Config
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin # Adds safe implementations of 4 elements (is_authenticated, get_id(), etc...)
-from app import db, login
+from app import app, db, login
+import numpy as np
 
 
 class User(UserMixin, db.Model):
@@ -73,10 +74,16 @@ class Trip(db.Model):
     components: so.WriteOnlyMapped['Component'] = so.relationship(cascade='all, delete', back_populates='trip', passive_deletes=True)
 
     def get_total_cost(self) -> float:
-        cost = db.session.query(sa.func.sum(Component.base_cost)).filter(Component.trip_id == self.id).scalar()
+        """Get the total cost of all components in the trip converted to the user's preferred currency. Rounded to 2 decimal places."""
+        components = db.session.scalars(self.components.select())
+        cost = np.sum(
+            component.base_cost * get_exchange_rate(component.currency, self.user.preferred_currency)
+            for component in components
+        )
+
         if not cost:
             cost = 0.0
-        return cost
+        return round(cost, 2)
 
     def __repr__(self):
         return f'<Trip {self.trip_name}, trip_id {self.id}, user_id {self.user_id}>'
@@ -185,7 +192,7 @@ class ExchangeRates(db.Model):
     def __repr__(self):
         return f'<ExchangeRate PLN to {self.currency_to} at rate {self.rate}>'
 
-
+# Helpers
 def populate_initial_data():
     """Seed the database with categories and types and commit changes to session."""
     # Add categories
@@ -205,3 +212,29 @@ def populate_initial_data():
 
     db.session.commit()
 
+
+def get_exchange_rate(currency_from, currency_to):
+    """Calculate the exchange rate from currency_from to currency_to using the PLN exchange rates from the database. 
+    Done this way to avoid making multiple API calls and being rate limited.
+    
+    Args:
+        currency_from (str): Currency code to convert from
+        currency_to (str): Currency code to convert to
+        
+    Returns:
+        float: Exchange rate from currency_from to currency_to"""
+    app.logger.info(f"Calculating exchange rate from {currency_from} to {currency_to}")
+    # Get the rate in PLN for each currency
+    rates = db.session.query(ExchangeRates.currency_to, ExchangeRates.rate).filter(
+        ExchangeRates.currency_to.in_([currency_from, currency_to])
+    ).all()
+    
+    rates_dict = {currency: rate for currency, rate in rates}
+
+    if currency_from not in rates_dict or currency_to not in rates_dict:
+        app.logger.warning(f"Currency rates for {currency_from} or {currency_to} not found in the database.")
+        raise ValueError("One or both of the currency codes are not available in the database.")
+
+    exchange_rate = rates_dict[currency_to] / rates_dict[currency_from]
+    app.logger.info(f"Exchange rate from {currency_from} to {currency_to}: {exchange_rate}")
+    return exchange_rate

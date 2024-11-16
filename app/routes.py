@@ -118,7 +118,7 @@ def trip(trip_id: int):
         flash('Your component has been added!')
         return redirect(url_for('trip', trip_id=trip_id))
     components = db.session.scalars(trip.components.select())
-    return render_template('trip.html', trip=trip, components=components, form=form)
+    return render_template('trip.html', trip=trip, components=components, form=form, preferred_currency=current_user.preferred_currency)
 
 
 # TODO: Category_id and type_id are being overwritten by id 1. Fix this later

@@ -2,7 +2,7 @@
 
 {% block content %}
     <h1>Trip: {{ trip.trip_name }}</h1>
-    Cost: {{ trip.get_total_cost() }}<br>
+    Cost: {{ trip.get_total_cost() }} {{ preferred_currency }}<br>
     <a id="delete" href="#" onclick="deleteTrip(
         {{ trip.id|tojson }}, reload=false)">Delete trip</a> <!--I call |tojson so JS knows it's safe and reload=false as I want to redirect-->
     <iframe src="/dash/{{ trip.id }}" style="width:100%; height:80vh; border:none;"> <!-- Hardcoded because its a dash endpoint, not flask-->

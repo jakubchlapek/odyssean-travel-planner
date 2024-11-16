@@ -1,7 +1,6 @@
 import requests
 from app import app, db
 from app.models import ExchangeRates
-import sqlalchemy as sa
 from datetime import datetime, timezone, timedelta
 
 BASE_URL = "https://api.fxratesapi.com/latest"
@@ -60,29 +59,3 @@ def update_exchange_rates():
         raise
     
     
-def get_exchange_rate(currency_from, currency_to):
-    """Calculate the exchange rate from currency_from to currency_to using the PLN exchange rates from the database. 
-    Done this way to avoid making multiple API calls and being rate limited.
-    
-    Args:
-        currency_from (str): Currency code to convert from
-        currency_to (str): Currency code to convert to
-        
-    Returns:
-        float: Exchange rate from currency_from to currency_to"""
-    app.logger.info(f"Calculating exchange rate from {currency_from} to {currency_to}")
-    # Get the rate in PLN for each currency
-    rates = db.session.query(ExchangeRates.currency_to, ExchangeRates.rate).filter(
-        ExchangeRates.currency_to.in_([currency_from, currency_to])
-    ).all()
-    
-    rates_dict = {currency: rate for currency, rate in rates}
-
-    if currency_from not in rates_dict or currency_to not in rates_dict:
-        app.logger.warning(f"Currency rates for {currency_from} or {currency_to} not found in the database.")
-        raise ValueError("One or both of the currency codes are not available in the database.")
-
-    exchange_rate = rates_dict[currency_to] / rates_dict[currency_from]
-    app.logger.info(f"Exchange rate from {currency_from} to {currency_to}: {exchange_rate}")
-    return exchange_rate
-

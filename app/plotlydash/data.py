@@ -1,6 +1,6 @@
 import pandas as pd
 from app import app, db
-from app.models import Component, Trip
+from app.models import Component, Trip, get_exchange_rate
 from config import Config
 import sqlalchemy as sa
 
@@ -14,12 +14,13 @@ def fetch_data(trip_id: int):
     if not trip_id or not isinstance(trip_id, int):
         return None
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
+    preferred_currency = trip.user.preferred_currency if trip.user else "PLN"
     components = db.session.scalars(trip.components.select()).all()
-    data = data_to_dict(components, trip.trip_name, trip.get_total_cost())
+    data = data_to_dict(components, trip.trip_name, trip.get_total_cost(), preferred_currency)
     return data
 
 
-def data_to_dict(components: list[Component], trip_name: str, trip_total_cost: float) -> dict:
+def data_to_dict(components: list[Component], trip_name: str, trip_total_cost: float, preferred_currency: str) -> dict:
     """Create a dictionary created from a list of components."""
     app.logger.info(f"Creating dictionary from components list for trip: {trip_name}.")
     if not components:
@@ -35,6 +36,7 @@ def data_to_dict(components: list[Component], trip_name: str, trip_total_cost: f
         "start_date": [getattr(c, 'start_date', pd.NaT) for c in components], 
         "end_date": [getattr(c, 'end_date', pd.NaT) for c in components],      
         "currency": [getattr(c, 'currency', "PLN") for c in components],
+        "exchange_rate": [get_exchange_rate(c.currency, preferred_currency) for c in components],
         "total_cost": trip_total_cost,     
         "title": trip_name
     }

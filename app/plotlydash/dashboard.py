@@ -2,6 +2,7 @@ import dash
 import plotly.express as px
 from flask import Flask
 from app.plotlydash.data import fetch_data
+import numpy as np
 
 
 def init_dash_app(server):
@@ -45,14 +46,16 @@ def init_callbacks(dash_app):
         dash.Input("data-store", "data")
     )
     def update_graph(data):
+        
         if data:
             # Create a figure using the fetched data
             fig = px.bar(
                 x=data["component_name"],
-                y=data["base_cost"],
+                y=np.array(data["base_cost"]) * np.array(data["exchange_rate"]),
                 title=data["title"],
                 labels={"x": "Component", "y": "Cost"},
                 color=data["category_name"])
             return fig
         # Placeholder figure if no data is loaded yet
         return px.line(title="Waiting for data...")
+    
