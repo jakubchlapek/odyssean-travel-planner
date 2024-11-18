@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 
 BASE_URL = "https://api.fxratesapi.com/latest"
 
-def fetch_rates(currency='PLN'):
+def fetch_rates(currency="PLN"):
     """Fetch the latest exchange rates from the API"""
     app.logger.info(f"Fetching exchange rates for base currency {currency}")
     params = {"base": currency}

@@ -23,4 +23,4 @@ else
 fi
 
 echo "Starting Flask application..."
-flask run
+flask run --reload 

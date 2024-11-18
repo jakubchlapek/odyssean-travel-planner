@@ -9,6 +9,7 @@ services:
     environment:
       - FLASK_APP=travel-planner.py
       - FLASK_ENV=development
+      - FLASK_DEBUG=1
       - DATABASE_URL=mysql+pymysql://travel-db:${DATABASE_PASSWORD}@db:3306/travel-db
       # - ELASTICSEARCH_URL=http://elasticsearch:9200
     ports:
@@ -16,6 +17,8 @@ services:
     depends_on:
       - db
       # - elasticsearch
+    volumes:
+      - ./app:/app/
 
     networks:
       - travel-network

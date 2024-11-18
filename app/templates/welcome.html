@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <body background="{{ url_for('static', filename='jpg/welcome.jpg') }}">
+    <div class="welcome-container">
+        <div class="welcome-main">
+            <h1 class="welcome-upper">Time for your</h1>
+            <h1 class="welcome-lower">next voyage</h1>
+            <h2>Let us help you plan it</h2>
+        </div>
+        <div class="btn">
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                {{ form.submit(value=("LET'S GET STARTED"), class_=('submit-btn')) }}
+            </form>
+        </div>
+    </div>
+{% endblock %}

@@ -22,6 +22,11 @@ def get_currency_choices():
 
 # Routes
 @app.route('/', methods=['GET', 'POST'])
+def welcome():
+    """Welcome page view."""
+    form = EmptyForm()
+    return render_template('welcome.html', form=form, title='Odyssean')
+
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
