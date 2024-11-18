@@ -1,6 +1,7 @@
 {% extends "base.html" %}
-
+{% set page_class = "welcome-page" %}
 {% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
     <body background="{{ url_for('static', filename='jpg/welcome.jpg') }}">
     <div class="welcome-container">
         <div class="welcome-main">

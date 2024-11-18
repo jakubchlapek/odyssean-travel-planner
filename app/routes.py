@@ -25,6 +25,8 @@ def get_currency_choices():
 def welcome():
     """Welcome page view."""
     form = EmptyForm()
+    if form.validate_on_submit():
+        return redirect(url_for('login'))
     return render_template('welcome.html', form=form, title='Odyssean')
 
 @app.route('/index', methods=['GET', 'POST'])

@@ -1,0 +1,68 @@
+
+/* Navigation Bar */ 
+.logo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    line-height: 0.9em;
+    margin-top: 16px;
+}
+
+.logo p {
+    text-decoration: none;
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    color: #1f221a;
+}
+
+.upper-logo {
+    font-weight: bolder;
+    font-size: 2.3em;
+}
+
+.lower-logo  {
+  font-weight: 400;
+  font-size: 1.6em;
+
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 25px;
+}
+
+.navbar-default{
+  border:none;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  margin: 0;
+}
+
+.nav-links li {
+  margin-left: 4em;
+}
+
+.nav-links a {
+  font-family:  "Roboto", "Fira Sans", sans-serif;
+  font-size: 1.9em;
+  text-decoration: none;
+  padding: 8px 12px;
+}
+
+.sign-page {
+  color: #1f221a;
+}
+
+.welcome-page {
+  color: #f5fbf9;
+}
+
+.nav-links li:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}

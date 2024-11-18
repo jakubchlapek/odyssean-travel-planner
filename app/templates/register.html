@@ -1,37 +1,51 @@
     {% extends "base.html" %}
-
+    {% set page_class = "sign-page" %}
     {% block content %}
-        <h1>Register</h1>
-        <form action="" method="post">
-            {{ form.hidden_tag() }}
-            <p>
-                {{ form.username.label }}<br>
-                {{ form.username(size=32) }}<br>
-                {% for error in form.username.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-            <p>
-                {{ form.email.label }}<br>
-                {{ form.email(size=64) }}<br>
-                {% for error in form.email.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-            <p>
-                {{ form.password.label }}<br>
-                {{ form.password(size=32) }}<br>
-                {% for error in form.password.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-            <p>
-                {{ form.password2.label }}<br>
-                {{ form.password2(size=32) }}<br>
-                {% for error in form.password2.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </p>
-            <p>{{ form.submit() }}</p>
-        </form>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/sign.css') }}">     
+        <body background="{{ url_for('static', filename='jpg/sign.jpg') }}">   
+            <div class="sign-container">
+                <div class="sign-photo column"></div>
+                <div class="sign-main column">
+                    <h1>Create new Account</h1>
+                    <h2>Already registered? <a class="redirect-link" href="{{ url_for("login")}}">Login</a></h2>
+                    <div class="user-form">
+                        <form action="" method="post" novalidate>
+                            {{ form.hidden_tag() }}
+                            <p>
+                                <a  class="field-name">{{ form.username.label }}</a><br>
+                                {{ form.username(size=32, class_=("field")) }}
+                                {% for error in form.username.errors %}
+                                <span class="error">[{{ error }}]</span>
+                                {% endfor %}
+                            </p>
+                            <p>
+                                <a  class="field-name">{{ form.email.label }}</a><br>
+                                {{ form.email(size=64, class_=("field")) }}
+                                {% for error in form.email.errors %}
+                                <span class="error">[{{ error }}]</span>
+                                {% endfor %}
+                            </p>
+                            <p>
+                                <a  class="field-name">{{ form.password.label }}</a><br>
+                                {{ form.password(size=32, class_=("field")) }}
+                                {% for error in form.password.errors %}
+                                <span class="error">[{{ error }}]</span>
+                                {% endfor %}
+                            </p>
+                            <p>
+                                <a  class="field-name">{{ form.password2.label }}</a><br>
+                                {{ form.password2(size=32, class_=("field")) }}
+                                {% for error in form.password2.errors %}
+                                <span class="error">[{{ error }}]</span>
+                                {% endfor %}
+                            </p>
+                            <div class="options">
+                                <div class="btn">
+                                    {{ form.submit(class_=('submit-btn')) }}
+                                </div>
+                            </div>
+                        </form>
+                    </form>
+                </div>
+            </div>
     {% endblock %}
