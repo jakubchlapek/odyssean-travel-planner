@@ -6,6 +6,7 @@ from config import Config
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin # Adds safe implementations of 4 elements (is_authenticated, get_id(), etc...)
 from app import app, db, login
+from hashlib import md5
 import numpy as np
 
 
@@ -16,6 +17,7 @@ class User(UserMixin, db.Model):
     - id: primary key | int
     - username: unique username | str
     - email: unique email | str
+    - about_me: user's about me | str
     - preferred_currency: user's preferred currency as an 3-letter ICO code | str 
     - password_hash: hashed password | str 
     - created_at: datetime of user creation | datetime
@@ -23,8 +25,9 @@ class User(UserMixin, db.Model):
     Foreign key relationships:
     - trips: one-to-many relationship with Trip model"""
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
+    username: so.Mapped[str] = so.mapped_column(sa.String(16), index=True, unique=True)
     email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True)
+    about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
     preferred_currency: so.Mapped[Optional[str]] = so.mapped_column(sa.String(3), default="PLN")
     password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
     created_at: so.Mapped[datetime] = so.mapped_column(
@@ -42,6 +45,10 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
+    
+    def avatar(self, size):
+        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
+        return f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
     
     def __repr__(self):
         return f'<User {self.username}>'    

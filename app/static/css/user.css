@@ -48,15 +48,14 @@
     width: 5em; 
     height: 5em; 
     overflow: hidden; 
-    border-radius: 50%;
+    border-radius: 10%;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
 }
 
 .circular {
-    border-radius: 50%;
+    border-radius: 10%;
     width: auto;
     height: 100%;
-    margin-left: -1.25em;
 }
 
 .user-about {
@@ -69,6 +68,16 @@
 
 .about-text {
     overflow: auto;
+}
+
+.about-text p {
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    font-size: 1em;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1em;
+    color: #2a3740;
+    margin: 0.2em;
 }
 
 .user-edit a {

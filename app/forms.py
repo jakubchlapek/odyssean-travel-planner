@@ -49,6 +49,7 @@ class EditProfileForm(FlaskForm):
     """Form for editing user profile."""
     username = StringField('Username', validators=[DataRequired()])
     currency = SelectField('Preferred currency', choices=[], validators=[DataRequired(), Length(min=3, max=3)])
+    about_me = TextAreaField('About me', validators=[Length(min=0, max=140)], render_kw={"placeholder": "Tell us about yourself."})
     submit = SubmitField('Submit')
 
     def __init__(self, original_username, *args, **kwargs):

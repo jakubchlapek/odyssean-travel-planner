@@ -92,6 +92,27 @@ def user(username: str):
     return render_template('user.html', user=user, trips=trips, form=form)
 
 
+@app.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    """Edit profile page view where the user can change their username and preferred currency."""
+    form = EditProfileForm(current_user.username)
+    form.currency.choices = get_currency_choices()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.preferred_currency = form.currency.data
+        current_user.about_me = form.about_me.data
+        db.session.commit()
+        app.logger.info(f"User {current_user.username}, id: {current_user.id} updated their profile.")
+        flash("Your changes have been saved.")
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.currency.data = current_user.preferred_currency
+        form.about_me.data = current_user.about_me
+    return render_template('edit_profile.html', title='Edit Profile', form=form)
+
+
 @app.route('/trip/<trip_id>', methods=['GET', 'POST'])
 @login_required
 def trip(trip_id: int):
@@ -209,21 +230,4 @@ def delete_component(component_id: int):
     return jsonify({"success": True, "trip_id": trip_id, "message": "Component deleted successfully."}), 200
 
 
-@app.route('/edit_profile', methods=['GET', 'POST'])
-@login_required
-def edit_profile():
-    """Edit profile page view where the user can change their username and preferred currency."""
-    form = EditProfileForm(current_user.username)
-    form.currency.choices = get_currency_choices()
-    if form.validate_on_submit():
-        current_user.username = form.username.data
-        current_user.preferred_currency = form.currency.data
-        db.session.commit()
-        app.logger.info(f"User {current_user.username}, id: {current_user.id} updated their profile.")
-        flash("Your changes have been saved.")
-        return redirect(url_for('edit_profile'))
-    elif request.method == 'GET':
-        form.username.data = current_user.username
-        form.currency.data = current_user.preferred_currency
-    return render_template('edit_profile.html', title='Edit Profile', form=form)
 
