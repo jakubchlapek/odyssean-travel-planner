@@ -23,32 +23,18 @@ def get_currency_choices():
 # Routes
 @app.route('/', methods=['GET', 'POST'])
 def welcome():
-    """Welcome page view."""
+    """Landing page view."""
     form = EmptyForm()
     if form.validate_on_submit():
         return redirect(url_for('login'))
     return render_template('welcome.html', form=form, title='Odyssean')
-
-@app.route('/index', methods=['GET', 'POST'])
-@login_required
-def index():
-    """Home page view, where the user can add a new trip."""
-    form = TripForm(user_id=current_user.id)
-    if form.validate_on_submit():
-        trip = Trip(user_id=current_user.id, trip_name=form.trip_name.data)
-        db.session.add(trip)
-        db.session.commit()
-        app.logger.info(f"User {current_user.username}, id: {current_user.id} added a new trip: {form.trip_name.data}, id: {trip.id}.")
-        flash('Your trip has been added!')
-        return redirect(url_for('trip', trip_id=trip.id))
-    return render_template('index.html', title='Home', form=form)
 
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
     """Login page view."""
     if current_user.is_authenticated:
-        return redirect(url_for("index"))
+        return redirect(url_for("user", username=current_user.username))
     form = LoginForm()
     if form.validate_on_submit():
         user = db.session.scalar(
@@ -59,7 +45,7 @@ def login():
             return redirect(url_for("login"))
         login_user(user, remember=form.remember_me.data)
         app.logger.info(f"User {user.username}, id: {user.id} logged in successfully.")
-        return redirect(url_for('index'))
+        return redirect(url_for('user', username=user.username))
     return render_template('login.html', title="Login", form=form)
 
 
@@ -68,14 +54,14 @@ def logout():
     """Logout route, used only for processing and a redirect."""
     app.logger.info(f"User {current_user.username}, id {current_user.id} logged out.")
     logout_user()
-    return redirect(url_for("index"))
+    return redirect(url_for("welcome"))
 
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
     """Register page view for new users."""
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('welcome'))
     form = RegistrationForm()
     if form.validate_on_submit():
         user = User(username=form.username.data, email=form.email.data)
@@ -88,14 +74,22 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@app.route('/user/<username>')
+@app.route('/user/<username>', methods=['GET', 'POST'])
 @login_required
 def user(username: str):
-    """User profile page view where the user can see their trips."""
+    """User profile page view where the user can add and see their trips."""
     user = db.first_or_404(sa.select(User).where(User.username == username))
     trips = db.session.scalars(user.trips.select())
     app.logger.info(f"User {current_user.username}, id: {current_user.id} viewed user's {username} profile.")
-    return render_template('user.html', user=user, trips=trips)
+    form = TripForm(user_id=current_user.id)
+    if form.validate_on_submit():
+        trip = Trip(user_id=current_user.id, trip_name=form.trip_name.data)
+        db.session.add(trip)
+        db.session.commit()
+        app.logger.info(f"User {current_user.username}, id: {current_user.id} added a new trip: {form.trip_name.data}, id: {trip.id}.")
+        flash('Your trip has been added!')
+        return redirect(url_for('user', username=username)) # Reload
+    return render_template('user.html', user=user, trips=trips, form=form)
 
 
 @app.route('/trip/<trip_id>', methods=['GET', 'POST'])

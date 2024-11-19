@@ -1,31 +1,5 @@
 
 /* Navigation Bar */ 
-.logo {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    line-height: 0.9em;
-    margin-top: 16px;
-}
-
-.logo p {
-    text-decoration: none;
-    font-family: "Fira Sans", "Roboto", sans-serif;
-    color: #1f221a;
-}
-
-.upper-logo {
-    font-weight: bolder;
-    font-size: 2.3em;
-}
-
-.lower-logo  {
-  font-weight: 400;
-  font-size: 1.6em;
-
-}
-
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -35,6 +9,31 @@
 
 .navbar-default{
   border:none;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  line-height: 0.9em;
+  margin-top: 16px;
+}
+
+.logo p {
+  text-decoration: none;
+  font-family: "Fira Sans", "Roboto", sans-serif;
+  color: #1f221a;
+}
+
+.upper-logo {
+  font-weight: bolder;
+  font-size: 2.3em;
+}
+
+.lower-logo  {
+font-weight: 400;
+font-size: 1.6em;
 }
 
 .nav-links {
@@ -59,6 +58,10 @@
 }
 
 .welcome-page {
+  color: #f5fbf9;
+}
+
+.user-page {
   color: #f5fbf9;
 }
 
