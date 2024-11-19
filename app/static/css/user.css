@@ -27,13 +27,17 @@
     border-radius: 1em;
     box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.2);
     padding: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .user-info {
     display:flex;
     flex-direction: row;
-    justify-content: space-evenly;
+    justify-content: space-around;
     align-items: center;
+    margin-bottom: 0.2em;
+    width: 90%;
     max-height: 100%;
     max-width: 100%;
 }
@@ -55,9 +59,188 @@
     margin-left: -1.25em;
 }
 
+.user-about {
+    background-color: white;
+    padding: 0.4em;
+    margin: 0.2em;
+    overflow: auto;
+    width: 90%;
+}
+
+.about-text {
+    overflow: auto;
+}
+
+.user-edit a {
+    text-decoration: none;
+    color: #2a3740;
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    font-size: 1.2em;
+    font-weight: 500;
+    font-style: italic;
+    line-height: 1em;
+    padding: 0.3em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.user-edit  :hover {
+    background-color: #eae3d6;
+    color: #222c34;
+    border-radius: 4px;
+}
+
 .user-form {
     max-height: 100%;
     max-width: 100%;
+    padding: 0.5em 0 0 0;
+}
+
+.user-form h1 {
+    font-family: "Roboto", "Fira Sans", sans-serif; 
+    font-size: 1.2em;
+    font-weight: 400;
+    font-style: italic;
+    line-height: 1em;
+    color: #2a3740;
+    margin-top: 0.2em;
+}
+
+
+.user-box h2 {
+    flex: 0;
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    color: #1f221a;
+    font-size: 2.5em;
+    font-weight: 700;
+}
+
+.user-box h3 {
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    color: #2a3740;
+    font-size: 2em;
+    font-weight: 400;
+    font-style:italic;
+}
+
+.trips {
+    flex: 7;
+}
+
+.trips-text {
+    margin: 0.4em;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    border-radius: 0.3em;
+    border: none;
+    height: 2.2em;
+    width: 100%;
+}
+
+.btn input {
+    display: flex;
+    padding: 10px 20px;
+    background-color: #2a3740;
+    border: none;
+    border-radius: 2em;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    width: 16em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.btn :hover {
+    background-color: #1e272e;
+    color: #fdf6ea;
+}
+
+
+.submit-btn {
+    text-decoration: none;
+    color: #fdf6ea;
+    font-weight: 500;
+    font-family:  "Roboto", "Fira Sans", sans-serif;
+    font-size: 1em;
+}
+
+.error {
+    font-family: "Roboto", "Fira Sans", sans-serif; 
+    color: #ff0000;
+    font-size: 0.9em;
+    margin-top: 3em;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.1em;
+    table-layout: fixed;
+}
+
+tr {
+    width: 90%;
+}
+
+td {
+    padding: 0.5em;
+    text-align: center;
+    border: none;
+    border-style: none;
+    background-color: #eae3d6;
+    max-width: 90%;
+}
+
+td:first-child {
+    border-top-left-radius: 10px; 
+    border-bottom-left-radius: 10px;
+}
+td:last-child {
+    border-bottom-right-radius: 10px; 
+    border-top-right-radius: 10px; 
+}
+
+.trip-name {
+    text-align: left;
+    justify-content: flex-start;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trip-name a {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 0.2em;
+}
+
+.trip-delete a {
+    display: flex;
+    justify-content: flex-end; 
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 0.1em;
+}
+
+td a {
+    text-decoration: none;
+    color: #2a3740;
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    font-size: 1em;
+    font-weight: 400;
+    padding: 0.1em;
+}
+
+.trip-name :hover {
+    text-decoration: none;
+    background-color: #dcd5c8;
+    color: #222c34;
+    border-radius: 4px;
+}
+
+.trip-delete :hover {
+    text-decoration: none;
+    background-color: #e83b5e5a;
+    color: #222c34;
+    border-radius: 4px;
 }
 
 body {

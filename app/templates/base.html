@@ -20,7 +20,7 @@
           <p class="lower-logo">Travel Planner</p>
         </div>
         <ul class="nav-links">
-          <li><a class={{ page_class }} href="{{ url_for('welcome') }}">Home</a></li>
+          <li><a class={{ page_class }} class="nav-link" href="{{ url_for('welcome') }}">Home</a></li>
           {% if current_user.is_anonymous %}
           <li><a class={{ page_class }} href="{{ url_for('login') }}">Login</a></li>
           {% else %}

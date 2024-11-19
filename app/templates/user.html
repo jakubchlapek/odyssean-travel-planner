@@ -11,31 +11,32 @@
                         <img class="circular" src="{{ url_for('static', filename='jpg/user.jpg') }}">
                     </div>
                     <div class="user-name">
-                        <h1>{{ user.username }}</h1>
+                        <h2>{{ user.username }}</h2>
                     </div>
                     <div class="user-edit">
                         {% if user == current_user %}
-                            <a href="{{ url_for('edit_profile') }}">Edit your profile</a>
+                            <a href="{{ url_for('edit_profile') }}">Edit profile</a>
                         {% endif %}
                     </div>
                 </div>
+                <h3>About me:</h3>
                 <div class="user-about">
-                    <h2>About me:</h2>
                     <div class="about-text"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p></div>
                 </div>
                 <div class="user-form">
                     {% if user == current_user %}
-                        <h1>Create a trip!</h1>
+                        <h1>Create a trip</h1>
                         <form action="" method="post">
                             {{ form.hidden_tag() }}
                             <p>
-                                {{ form.trip_name.label }}<br>
-                                {{ form.trip_name(size=32) }}<br>
+                                {{ form.trip_name(size=32, class_=("field"), placeholder="Trip name") }}
                                 {% for error in form.trip_name.errors %}
-                                <span style="color: red;">[{{ error }}]</span>
+                                <span class="error">[{{ error }}]</span>
                                 {% endfor %}
                             </p>
-                            <p>{{ form.submit() }}</p>
+                            <div class="btn">
+                                {{ form.submit(class_=('submit-btn')) }}
+                            </div>
                         </form>
                     {% endif %}
                 </div>
@@ -43,7 +44,7 @@
         </div>
         <div class="column">
             <div class="user-box">
-                <h2>User's trips:</h2>
+                <h2 class="trips-text">User's trips:</h2>
                 <div class="trips">
                 {% for trip in trips %}
                     {% include '_trip.html' %}

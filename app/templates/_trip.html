@@ -1,15 +1,16 @@
 <table>
+    <colgroup>
+        <col style="width: 80%;">
+        <col style="width: 20%;">
+    </colgroup>
     <tr valign="top">
-        <td>
-            <a>{{ trip }}</a>
-            <td>
-                &emsp;<a href="{{ url_for('trip', trip_id=trip.id) }}">Edit</a>
-            </td>
-            <td>
-                &emsp;<a href="#" onclick="deleteTrip(
-                    {{ trip.id|tojson }}, reload=true)">Delete trip</a> 
-                    <!--I call |tojson so JS knows it's safe and reload=false as I want to redirect-->
-            </td>
+        <td class="trip-name">
+            <a href="{{ url_for('trip', trip_id=trip.id) }}">{{ trip }}</a>   
+        </td>
+        <td class="trip-delete">
+            <a href="#" onclick="deleteTrip(
+            {{ trip.id|tojson }}, reload=true)">Delete trip</a> 
+            <!--I call |tojson so JS knows it's safe and reload=false as I want to redirect-->
         </td>
     </tr>
 </table>
