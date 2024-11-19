@@ -199,6 +199,8 @@ td {
     border-style: none;
     background-color: #eae3d6;
     max-width: 90%;
+    top: 50%;
+    bottom: 50%; 
 }
 
 td:first-child {
@@ -215,6 +217,7 @@ td:last-child {
     justify-content: flex-start;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .trip-name a {
@@ -227,6 +230,7 @@ td:last-child {
     justify-content: flex-end; 
     transition: background-color 0.3s ease, color 0.3s ease;
     padding: 0.1em;
+    
 }
 
 td a {
