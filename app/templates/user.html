@@ -13,11 +13,6 @@
                     <div class="user-name">
                         <h2>{{ user.username }}</h2>
                     </div>
-                    <div class="user-edit">
-                        {% if user == current_user %}
-                            <a href="{{ url_for('edit_profile') }}">Edit profile</a>
-                        {% endif %}
-                    </div>
                 </div>
                 <h3>About me:</h3>
                 <div class="user-about">
@@ -31,15 +26,15 @@
                 </div>
                 <div class="user-form">
                     {% if user == current_user %}
-                        <h1>Create a trip</h1>
                         <form action="" method="post">
                             {{ form.hidden_tag() }}
-                            <p>
+                            <span>
+                                <h1>Create a trip</h1>
                                 {{ form.trip_name(size=32, class_=("field"), placeholder="Trip name") }}
                                 {% for error in form.trip_name.errors %}
                                 <span class="error">[{{ error }}]</span>
                                 {% endfor %}
-                            </p>
+                            </span>
                             <div class="btn">
                                 {{ form.submit(class_=('submit-btn')) }}
                             </div>
@@ -49,7 +44,7 @@
             </div>
         </div>
         <div class="column">
-            <div class="user-box">
+            <div class="user-box trips-box">
                 <h2 class="trips-text">User's trips:</h2>
                 <div class="trips">
                 {% for trip in trips %}

@@ -9,7 +9,7 @@ from app.models import User, Trip, ExchangeRates, ComponentCategory, ComponentTy
 
 class LoginForm(FlaskForm):
     """Form for logging in a user."""
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=12)])
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
@@ -17,7 +17,7 @@ class LoginForm(FlaskForm):
 
 class RegistrationForm(FlaskForm):
     """Form for registering a new user."""
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=12)])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField(
@@ -47,7 +47,7 @@ class RegistrationForm(FlaskForm):
 
 class EditProfileForm(FlaskForm):
     """Form for editing user profile."""
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired(), Length(min=3, max=12)])
     currency = SelectField('Preferred currency', choices=[], validators=[DataRequired(), Length(min=3, max=3)])
     about_me = TextAreaField('About me', validators=[Length(min=0, max=140)], render_kw={"placeholder": "Tell us about yourself."})
     submit = SubmitField('Submit')

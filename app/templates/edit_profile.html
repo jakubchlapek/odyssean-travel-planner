@@ -1,31 +1,46 @@
 {% extends "base.html" %}
 {% set page_class = "user-page"%}
 {% block content %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
     <body background="{{ url_for('static', filename='jpg/user.jpg') }}">
-    <h1>Edit Profile</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.username.label }}<br>
-            {{ form.username(size=32) }}<br>
-            {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.currency.label }}<br>
-            {{ form.currency() }}<br>
-            {% for error in form.currency.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.about_me.label }}<br>
-            {{ form.about_me(size=140) }}<br>
-            {% for error in form.about_me.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        <p>{{ form.submit() }}</p>
+    <div class="user-container">
+        <div class="column">
+            <div class="user-box">
+                <div class="user-info" style="margin-bottom: 1.5em;"> 
+                    <div class="user-photo">
+                        <img class="circular" src="{{ current_user.avatar(size=128) }}">
+                    </div>
+                    <div class="user-name">
+                        {{ form.username(class_=("field"), style_=("margin-left:0.75em;")) }}
+                        {% for error in form.username.errors %}
+                        <span class="error">[{{ error }}]</span>
+                        {% endfor %}
+                    </div>
+                    <div class="back-button">
+                        <a href="{{ url_on_return }}" class="redirect-link">Back</a>
+                    </div>
+                </div>
+                <div class="user-currency">
+                    <h4>{{ form.currency.label }}</h4>
+                    <span>{{ form.currency(class_=("field"), style_=("width:3em; height:1.6em; min-height:1.6em;")) }}</span>
+                    {% for error in form.currency.errors %}
+                    <span class="error">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <h4 style="margin-top: 0.7em;">About me:</h4>
+                <div>
+                    {{ form.about_me(class_=("field"), style_=("width: 24em; height: 6em; margin-bottom: 4em; margin-top: 0.5em;")) }}
+                    {% for error in form.about_me.errors %}
+                    <span class="error">[{{ error }}]</span>
+                    {% endfor %}
+                </div>
+                <div class="btn">
+                    {{ form.submit(class_=("submit-btn")) }}
+                </div>
+            </div>
+        </div>
+    </div>
     </form>
 {% endblock %}

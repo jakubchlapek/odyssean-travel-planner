@@ -17,16 +17,18 @@
     background-color: white;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
     align-items: center;
-    width: 70%;
-    height: 70%;
+    width: 32em;
+    height: 32em;
     max-width: 80vmin;
     max-height: 80vmin;
     background-color: #fdf6ea;
     border-radius: 1em;
     box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.2);
     padding: 20px;
+}
+
+.trips-box {
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -34,40 +36,43 @@
 .user-info {
     display:flex;
     flex-direction: row;
-    justify-content: space-around;
     align-items: center;
-    margin-bottom: 0.2em;
     width: 90%;
     max-height: 100%;
     max-width: 100%;
+    padding: 0.4em;
 }
 
 .user-photo {
     display: inline-block;
     position: relative;
-    width: 5em; 
-    height: 5em; 
+    width: 4.8em; 
+    height: 4.8em; 
     overflow: hidden; 
     border-radius: 10%;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    margin-right: 0.8em;
+    min-width: 4.8em;
+
 }
 
 .circular {
     border-radius: 10%;
-    width: auto;
     height: 100%;
+    width: auto;
 }
 
 .user-about {
     background-color: white;
-    padding: 0.4em;
-    margin: 0.2em;
-    overflow: auto;
     width: 90%;
+    height: 50em;
 }
 
 .about-text {
     overflow: auto;
+    overflow-wrap: break-word;
+    padding: 0.4em;
+    height: 100%;
 }
 
 .about-text p {
@@ -80,28 +85,19 @@
     margin: 0.2em;
 }
 
-.user-edit a {
-    text-decoration: none;
-    color: #2a3740;
-    font-family: "Fira Sans", "Roboto", sans-serif;
-    font-size: 1.2em;
-    font-weight: 500;
-    font-style: italic;
-    line-height: 1em;
-    padding: 0.3em;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.user-edit  :hover {
-    background-color: #eae3d6;
-    color: #222c34;
-    border-radius: 4px;
-}
-
 .user-form {
     max-height: 100%;
     max-width: 100%;
     padding: 0.5em 0 0 0;
+    margin-top: auto;
+}
+
+.user-form span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1em;
+    width: 26.8em;
 }
 
 .user-form h1 {
@@ -112,8 +108,8 @@
     line-height: 1em;
     color: #2a3740;
     margin-top: 0.2em;
+    width: 8em;
 }
-
 
 .user-box h2 {
     flex: 0;
@@ -126,9 +122,18 @@
 .user-box h3 {
     font-family: "Fira Sans", "Roboto", sans-serif;
     color: #2a3740;
-    font-size: 2em;
+    font-size: 1.2em;
     font-weight: 400;
     font-style:italic;
+    margin-top: 0.5em;
+}
+
+.user-box h4 {
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    color: #1f221a;
+    font-size: 1.5em;
+    font-weight: 700;
+    margin-top: 0.5em;
 }
 
 .trips {
@@ -146,6 +151,18 @@
     border: none;
     height: 2.2em;
     width: 100%;
+    font-weight:600;
+    size:auto; 
+    text-align:center;
+    resize: none;
+    overflow-y: hidden;
+    min-height: 2.2em;
+}
+
+.btn {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
 }
 
 .btn input {
@@ -181,65 +198,50 @@
     margin-top: 3em;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 0.1em;
-    table-layout: fixed;
-}
-
-tr {
-    width: 90%;
-}
-
-td {
+.trip-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 28em;
+    height: 2.8em;
     padding: 0.5em;
-    text-align: center;
-    border: none;
-    border-style: none;
     background-color: #eae3d6;
-    max-width: 90%;
-    top: 50%;
-    bottom: 50%; 
+    border-radius: 6px;
+    margin-bottom: 0.5em;
 }
 
-td:first-child {
-    border-top-left-radius: 10px; 
-    border-bottom-left-radius: 10px;
-}
-td:last-child {
-    border-bottom-right-radius: 10px; 
-    border-top-right-radius: 10px; 
+.trip-row a {
+    color: #2a3740;
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    font-size: 1em;
+    font-weight: 400;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .trip-name {
     text-align: left;
     justify-content: flex-start;
     overflow: hidden;
+    max-width: 21em;
     text-overflow: ellipsis;
     white-space: nowrap;
+    border-radius: 4px;
 }
 
 .trip-name a {
-    transition: background-color 0.3s ease, color 0.3s ease;
-    padding: 0.2em;
+    padding: 0.2em 0.4em;
+}
+
+.trip-delete {
+    border-radius: 4px;
+    display: flex;
+    justify-content: flex-end; 
 }
 
 .trip-delete a {
-    display: flex;
-    justify-content: flex-end; 
-    transition: background-color 0.3s ease, color 0.3s ease;
-    padding: 0.1em;
-    
-}
-
-td a {
-    text-decoration: none;
-    color: #2a3740;
-    font-family: "Fira Sans", "Roboto", sans-serif;
-    font-size: 1em;
-    font-weight: 400;
-    padding: 0.1em;
+    padding: 0.1em 0.3em;
+    width: auto;
 }
 
 .trip-name :hover {
@@ -273,4 +275,28 @@ body {
     left: 0;
     width: 100%;
     z-index: 1000;
+}
+
+.user-currency {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.redirect-link {
+    color: #2a3740;
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    font-size: 1.6em;
+    font-weight: 400;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 0.1em 0.2em;
+    margin-left: 1.5em;
+}
+
+.redirect-link:hover {
+    text-decoration: none;
+    background-color: #dcd5c8;
+    color: #222c34;
+    border-radius: 4px;
 }

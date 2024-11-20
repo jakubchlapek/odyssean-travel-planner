@@ -25,7 +25,7 @@ class User(UserMixin, db.Model):
     Foreign key relationships:
     - trips: one-to-many relationship with Trip model"""
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    username: so.Mapped[str] = so.mapped_column(sa.String(16), index=True, unique=True)
+    username: so.Mapped[str] = so.mapped_column(sa.String(12), index=True, unique=True)
     email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True)
     about_me: so.Mapped[Optional[str]] = so.mapped_column(sa.String(140))
     preferred_currency: so.Mapped[Optional[str]] = so.mapped_column(sa.String(3), default="PLN")

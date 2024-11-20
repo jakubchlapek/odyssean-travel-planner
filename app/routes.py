@@ -19,7 +19,6 @@ def get_type_choices(category_id=None):
 def get_currency_choices():
     return [(e.currency_to, e.currency_to) for e in db.session.scalars(sa.select(ExchangeRates)).all()]
 
-
 # Routes
 @app.route('/', methods=['GET', 'POST'])
 def welcome():
@@ -96,6 +95,7 @@ def user(username: str):
 @login_required
 def edit_profile():
     """Edit profile page view where the user can change their username and preferred currency."""
+    url_on_return = request.referrer or url_for('user', username=current_user.username)
     form = EditProfileForm(current_user.username)
     form.currency.choices = get_currency_choices()
     if form.validate_on_submit():
@@ -105,12 +105,12 @@ def edit_profile():
         db.session.commit()
         app.logger.info(f"User {current_user.username}, id: {current_user.id} updated their profile.")
         flash("Your changes have been saved.")
-        return redirect(url_for('edit_profile'))
+        return redirect(url_on_return)
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.currency.data = current_user.preferred_currency
         form.about_me.data = current_user.about_me
-    return render_template('edit_profile.html', title='Edit Profile', form=form)
+    return render_template('edit_profile.html', title='Edit Profile', form=form, url_on_return = url_on_return)
 
 
 @app.route('/trip/<trip_id>', methods=['GET', 'POST'])
