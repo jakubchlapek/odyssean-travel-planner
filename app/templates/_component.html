@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/trip.css') }}">
-<div class="component-row">
+<div class="component-row" id="category-{{component.category_id}}">
     <span class="component-name"><a onclick="changeEditedComponent({{component.id|tojson}})">{{ component }}</a></span>
     <span class="component-delete"><a id="delete" href="#" onclick="deleteComponentAndReload({{component.id|tojson}})">Delete</a></span> 
     <!--I call |tojson so JS knows it's safe and reload=false as I want to redirect-->

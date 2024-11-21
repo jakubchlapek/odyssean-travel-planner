@@ -26,7 +26,7 @@ def welcome():
     form = EmptyForm()
     if form.validate_on_submit():
         return redirect(url_for('login'))
-    return render_template('welcome.html', form=form, title='Odyssean')
+    return render_template('welcome.html', form=form, title='Welcome')
 
 
 @app.route('/login', methods=["GET", "POST"])
@@ -119,10 +119,9 @@ def trip(trip_id: int):
     """Trip page view where the user can see, add and delete trip components."""
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
     components = db.session.scalars(trip.components.select())
-    return render_template('trip.html', trip=trip, components=components, preferred_currency=current_user.preferred_currency)
+    return render_template('trip.html', title="Trip", trip=trip, components=components, preferred_currency=current_user.preferred_currency)
 
 
-# TODO: Category_id and type_id are being overwritten by id 1. Fix this later
 @app.route('/component/<component_id>', methods=['GET', 'POST'])
 @login_required
 def component(component_id: int):

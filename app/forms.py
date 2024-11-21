@@ -101,7 +101,7 @@ class TripForm(FlaskForm):
 class ComponentForm(FlaskForm):
     """Form for adding or editing a trip component."""
     component_name = StringField('Component name', validators=[DataRequired()])
-    category_id = SelectField('Category name', choices=[], validators=[DataRequired()], default=1)
+    category_id = SelectField('Category name', choices=[], coerce=int, validators=[DataRequired()])
     type_id = SelectField('Type name', choices=[], coerce=int, validators=[DataRequired()])
     base_cost = DecimalField('Cost', default=0.0, places=2, validators=[InputRequired(), NumberRange(min=0)])
     currency = SelectField('Cost currency', choices=[], default="PLN", validators=[Length(min=3, max=3)])
