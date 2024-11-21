@@ -1,0 +1,225 @@
+body {
+    margin: 0;
+    background-clip: border-box;
+    background-repeat: no-repeat;;
+    background-attachment: fixed;
+    background-position-x: 30%;
+    background-position-y: 0%;
+    background-size: contain;
+    backdrop-filter: blur(4px);
+}
+
+.trip-container {
+    display: flex;
+}
+
+.column {
+    background-color: #fdf6ea;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;    
+    flex: 2;
+    margin-top: 0em;
+}
+
+.half-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;    
+    flex: 1;
+    margin-top: 6em;
+}
+
+.left-bar {
+    background-color: #fdf6ea;
+    height:100vh;
+    top: 0;
+    left: 0;
+    margin-top: 0em;
+}
+
+.field-box {
+    padding: 0.2em;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+}
+
+iframe {
+    width:100%;
+    height:100%;
+    border: none;
+    background-color: #fdf6ea;
+}
+
+.field {
+    border-radius: 0.3em;
+    border: none;
+    height: 1.8em;
+    width: 100%;
+    font-weight:600;
+    text-align:center;
+    resize: none;
+    overflow-y: hidden;
+    min-height: 1.8em;
+    margin-left: 0.5em;
+    display: inline;
+}
+
+.field-name {
+    font-family: "Fira Sans", "Roboto", sans-serif; 
+    font-size: 0.9em;
+    font-weight: 300;
+    line-height: 1em;
+    font-style: italic;
+    color: #1f221a;
+}
+
+.trip-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    margin-top: 0.5em;
+}
+
+img {
+    width: 1.1em;
+    height: auto;
+    padding: 0.2em;
+    margin-left: 16.2em;
+    margin-bottom: 0.2em;
+    cursor: pointer;
+}   
+
+.add-btn {
+    margin-bottom: 1em;
+    display: flex;
+}
+
+.btn {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+}
+
+.btn input {
+    display: flex;
+    padding: 10px 20px;
+    background-color: #2a3740;
+    border: none;
+    border-radius: 2em;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    width: 12em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-top: 1.8em;
+    overflow: none;
+}
+
+.btn :hover {
+    background-color: #1e272e;
+    color: #fdf6ea;
+}
+
+.submit-btn {
+    text-decoration: none;
+    color: #fdf6ea;
+    font-weight: 500;
+    font-family:  "Roboto", "Fira Sans", sans-serif;
+    font-size: 1em;
+}
+
+.error {
+    font-family: "Roboto", "Fira Sans", sans-serif; 
+    color: #ff0000;
+    font-size: 0.9em;
+    margin-top: 3em;
+}
+
+.components-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 7em;
+    overflow: auto;
+    height: 100%;
+}
+
+.component-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 20em;
+    max-width: 25vmax;
+    height: 2.8em;
+    padding: 0.5em;
+    background-color: #eae3d6;
+    border-radius: 6px;
+    margin-bottom: 0.5em;
+}
+
+.component-row a {
+    color: #2a3740;
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    font-size: 1em;
+    font-weight: 400;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.component-name {
+    text-align: left;
+    justify-content: flex-start;
+    overflow: hidden;
+    max-width: 15.5em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.component-name a {
+    padding: 0.2em 0.4em;
+}
+
+.component-delete {
+    border-radius: 4px;
+    display: flex;
+    justify-content: flex-end; 
+}
+
+.component-delete a {
+    padding: 0.1em 0.3em;
+    width: auto;
+}
+
+.component-name :hover {
+    text-decoration: none;
+    background-color: #dcd5c8;
+    color: #222c34;
+    border-radius: 4px;
+}
+
+.component-delete :hover {
+    text-decoration: none;
+    background-color: #e83b5e5a;
+    color: #222c34;
+    border-radius: 4px;
+}
+
+.edit-component {
+    margin-top: 1.8em;
+    max-width: 25vmax;
+    min-width: 20vmax;
+    height: 30em;
+    overflow: none;
+    padding: 1em;
+    border-radius: 6px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+.dash-container {
+    margin-top: 6em;
+    min-width: 45vmax;
+}

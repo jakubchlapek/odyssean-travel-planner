@@ -1,7 +1,8 @@
 {% block content %}
-    <h1>{{ component.component_name }}</h1>
-    <a id="delete" href="#" onclick="deleteComponentAndReloadParent({{component.id|tojson}})">Delete component</a>
-    <h2>Edit component</h2>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/trip.css') }}">
+    <a class="delete" onclick="deleteComponentAndReload({{ component.id | tojson | safe }})">
+        <img src="{{ url_for('static', filename='svg/close.svg') }}">
+    </a>
     {% include '_edit_component.html' %}
 {% endblock %}
 

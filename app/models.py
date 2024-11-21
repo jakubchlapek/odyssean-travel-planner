@@ -178,7 +178,7 @@ class Component(db.Model):
     type: so.Mapped[ComponentType] = so.relationship(back_populates='components')
 
     def __repr__(self):
-        return f'<Component name {self.component_name}, category {self.category_id}, type {self.type_id}, cost {self.base_cost}>'
+        return f'{self.component_name}, {self.base_cost} {self.currency}'
     
 
 class ExchangeRates(db.Model):

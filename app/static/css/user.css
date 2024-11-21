@@ -269,14 +269,6 @@ body {
     background-size: cover;
 }
 
-.navbar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-}
-
 .user-currency {
     display: flex;
     flex-direction: column;

@@ -20,7 +20,6 @@
           <p class="lower-logo">Travel Planner</p>
         </div>
         <ul class="nav-links">
-          <li><a class={{ page_class }} class="nav-link" href="{{ url_for('welcome') }}">Home</a></li>
           {% if current_user.is_anonymous %}
           {% else %}
           <li><a class={{ page_class }} href="{{ url_for('user', username=current_user.username) }}">Trips</a></li>
@@ -31,13 +30,15 @@
       </nav>
       {% with messages = get_flashed_messages() %}
       {% if messages %}
-      <ul class="flash-messages">
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-      {% endwith %}
+      <div class="flash-messages">
+        <ul>
+          {% for message in messages %}
+          <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+      </div>
       {% block content %}{% endblock %}
     </body>
 </html>

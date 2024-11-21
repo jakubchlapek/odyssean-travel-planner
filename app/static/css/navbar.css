@@ -1,8 +1,10 @@
 /* Navigation Bar */ 
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
   padding: 10px 25px;
 }
 
@@ -93,4 +95,22 @@ li a {
 .edit-user-page:hover {
   color: #f5fbf9;
   background-color: #f5fbf930;
+}
+
+.trip-page {
+  color: #1f221a;
+}
+
+.trip-page:hover {
+  color: #1f221a;
+  background-color: #1f221a30;
+}
+
+.error-page {
+  color: #1f221a;
+}
+
+.error-page:hover {
+  color: #1f221a;
+  background-color: #1f221a30;
 }

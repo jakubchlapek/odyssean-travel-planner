@@ -116,31 +116,10 @@ def edit_profile():
 @app.route('/trip/<trip_id>', methods=['GET', 'POST'])
 @login_required
 def trip(trip_id: int):
-    """Trip page view where the user can see and add trip components."""
+    """Trip page view where the user can see, add and delete trip components."""
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
-    form = ComponentForm()
-    form.category_id.choices = get_category_choices()
-    form.type_id.choices = get_type_choices(category_id=form.category_id.data)
-    form.currency.choices = get_currency_choices()
-    if form.validate_on_submit():
-        component = Component(
-                trip_id = trip_id,
-                category_id = form.category_id.data,
-                type_id = form.type_id.data, 
-                component_name = form.component_name.data,
-                base_cost = form.base_cost.data,
-                currency = form.currency.data,
-                description = form.description.data,
-                link = form.link.data,
-                start_date = form.start_date.data,
-                end_date = form.end_date.data,)
-        db.session.add(component)
-        db.session.commit()
-        app.logger.info(f"User {current_user.username} added a new component to trip {trip.trip_name}, id: {trip_id}.")
-        flash('Your component has been added!')
-        return redirect(url_for('trip', trip_id=trip_id))
     components = db.session.scalars(trip.components.select())
-    return render_template('trip.html', trip=trip, components=components, form=form, preferred_currency=current_user.preferred_currency)
+    return render_template('trip.html', trip=trip, components=components, preferred_currency=current_user.preferred_currency)
 
 
 # TODO: Category_id and type_id are being overwritten by id 1. Fix this later
@@ -168,6 +147,7 @@ def component(component_id: int):
         db.session.commit()
         app.logger.info(f"User {current_user.username} edited the component {component.component_name}, id: {component.id}.")
         flash('Your component has been updated!')
+        return render_template('__reload.html')
     elif request.method == 'GET': # If it's a GET, then no data has been submitted from form so we fill with the component data
         form.category_id.data = component.category_id
         form.type_id.data = component.type_id
@@ -179,6 +159,36 @@ def component(component_id: int):
         form.start_date.data = component.start_date
         form.end_date.data = component.end_date
     return render_template('component.html', component=component, form=form)
+
+
+@app.route('/create_component/<trip_id>', methods=['GET', 'POST'])
+@login_required
+def create_component(trip_id: int):
+    """Create component page view where the user can add a new component to a trip."""
+    trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
+    form = ComponentForm()
+    form.category_id.choices = get_category_choices()
+    form.type_id.choices = get_type_choices(category_id=form.category_id.data)
+    form.currency.choices = get_currency_choices()
+    if form.validate_on_submit():
+        component = Component(
+                trip_id = trip_id,
+                category_id = form.category_id.data,
+                type_id = form.type_id.data, 
+                component_name = form.component_name.data,
+                base_cost = form.base_cost.data,
+                currency = form.currency.data,
+                description = form.description.data,
+                link = form.link.data,
+                start_date = form.start_date.data,
+                end_date = form.end_date.data,)
+        db.session.add(component)
+        db.session.commit()
+        app.logger.info(f"User {current_user.username} added a new component to trip {trip.trip_name}, id: {trip_id}.")
+        flash('Your component has been added!')
+        return render_template('__reload.html')
+    return render_template('_edit_component.html', form=form)
+        
 
 
 @app.route('/type/<category_id>')

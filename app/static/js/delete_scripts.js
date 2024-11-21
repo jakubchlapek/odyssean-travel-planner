@@ -1,8 +1,9 @@
-function reloadParent() { // for iframes
-    parent.location.href=parent.location.href
+function reloadPageAndParent() { // for iframes
+    parent.location.reload();
 };
 
-function deleteComponentAndReloadParent(component_id) {
+function deleteComponentAndReload(component_id) {
+    // For iframes - deletes the component with the given component_id and reloads the parent page
     if (confirm("Are you sure you want to delete this component?")) {
         fetch("/delete_component/" + component_id, {
             method: "POST",
@@ -13,8 +14,8 @@ function deleteComponentAndReloadParent(component_id) {
         .then(response => response.json())  // Parse the response as JSON
         .then(data => {
             if (data.success) {
-                // If deletion was successful, reload the parent page
-                reloadParent()
+                // If deletion was successful, reload the page and parent
+                reloadPageAndParent();
             } else {
                 alert(data.message || "Failed to delete the component.");
             }
@@ -52,3 +53,16 @@ function deleteTrip(trip_id, reload=true) {
         });
     }
 };
+
+function setNewEditedComponent(trip_id) {
+    const edit_component = document.getElementById('edit-component');
+    if (edit_component) {
+        edit_component.innerHTML = '<iframe class="edit-component" src="/create_component/' + trip_id + '"></iframe>';
+    }
+}
+function changeEditedComponent(component_id) {
+    const edit_component = document.getElementById('edit-component');
+    if (edit_component) {
+        edit_component.innerHTML = '<iframe class="edit-component" src="/component/' + component_id + '"></iframe>';
+    }
+}

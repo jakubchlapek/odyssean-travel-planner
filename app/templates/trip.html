@@ -1,22 +1,36 @@
 {% extends "base.html" %}
-
+{% set page_class = "trip-page" %}
 {% block content %}
-    <h1>Trip: {{ trip.trip_name }}</h1>
-    Cost: {{ trip.get_total_cost() }} {{ preferred_currency }}<br>
-    <a id="delete" href="#" onclick="deleteTrip(
-        {{ trip.id|tojson }}, reload=false)">Delete trip</a> <!--I call |tojson so JS knows it's safe and reload=false as I want to redirect-->
-    <iframe src="/dash/{{ trip.id }}" style="width:100%; height:80vh; border:none;"> <!-- Hardcoded because its a dash endpoint, not flask-->
-        Your browser does not support iframes.
-    </iframe>
-    <h2>Trip components</h2>
-    {% for component in components %}
-        <!-- {% include '_component.html' %} -->
-        <div>
-            <iframe src="{{url_for('component', component_id=component.id)}}">
-                Your browser does not support iframes.
-            </iframe>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/trip.css') }}">
+    <script src="{{ url_for('static', filename='js/delete_scripts.js') }}"></script>
+    <body background="{{ url_for('static', filename='jpg/trip.jpg') }}">
+    <div class="trip-container">
+        <div class="half-column left-bar">
+            <div class="components-list">
+                {% for component in components %}
+                    <div>
+                        {% include '_component.html' %}
+                        <!--  <iframe class="trip-box" src="{{url_for('component', component_id=component.id)}}">
+                            Your browser does not support iframes.
+                        </iframe> -->
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="btn add-btn">
+                <input class="submit-btn" type="button" value="Add new component" onclick="setNewEditedComponent({{ trip.id }})"></input>
+            </div>
         </div>
-    {% endfor %}
-    <h2>Add component</h2>
-    {% include '_edit_component.html' %}
+        <div class="half-column">
+            <div id="edit-component">
+            </div>
+        </div>
+        <div class="column">
+            <div class="dash-container">
+                <iframe src="/dash/{{ trip.id }}" style="width:100%; height:80vh; border:none;"> <!-- Hardcoded because its a dash endpoint, not flask-->
+                    Your browser does not support iframes.
+                </iframe>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}

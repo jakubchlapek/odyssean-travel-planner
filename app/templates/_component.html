@@ -1,13 +1,7 @@
-<table>
-    <tr valign="top">
-        <td>
-            <a>{{ component }}</a>
-        </td> 
-        <td>
-            &emsp;<a href="{{ url_for('component', component_id=component.id) }}">Edit</a>
-        </td>
-        <td>
-            &emsp;<a href="{{ url_for('delete_component', component_id=component.id) }}">Delete</a>
-        </td>
-    </tr>
-</table>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/trip.css') }}">
+<div class="component-row">
+    <span class="component-name"><a onclick="changeEditedComponent({{component.id|tojson}})">{{ component }}</a></span>
+    <span class="component-delete"><a id="delete" href="#" onclick="deleteComponentAndReload({{component.id|tojson}})">Delete</a></span> 
+    <!--I call |tojson so JS knows it's safe and reload=false as I want to redirect-->
+</div>
+<script src="{{ url_for('static', filename='js/delete_scripts.js') }}"></script>

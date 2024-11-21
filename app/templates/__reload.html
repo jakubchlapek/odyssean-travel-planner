@@ -1,0 +1,8 @@
+{% block content %}
+    <script src="{{ url_for('static', filename='js/delete_scripts.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            reloadPageAndParent();
+        });
+    </script>
+{% endblock %}

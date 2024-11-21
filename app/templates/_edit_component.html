@@ -1,70 +1,73 @@
 {% block content %}
-    <form action="" method="post">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/trip.css') }}">
+    <form class="trip-form" method="post">
         {{ form.hidden_tag() }}
-        <p>
-            {{ form.component_name.label }}<br>
-            {{ form.component_name(size=32) }}<br>
-            {% for error in form.component_name.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.category_id.label }}<br>
-            {{ form.category_id() }}<br>
-            {% for error in form.category_id.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.type_id.label }}<br>
-            {{ form.type_id() }}<br>
-            {% for error in form.type_id.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.base_cost.label }}<br>
-            {{ form.base_cost() }}<br>
-            {% for error in form.base_cost.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.currency.label }}<br>
-            {{ form.currency() }}<br>
-            {% for error in form.currency.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.description.label }}<br>
-            {{ form.description(rows=4, cols=32) }}<br>
-            {% for error in form.description.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.link.label }}<br>
-            {{ form.link() }}<br>
-            {% for error in form.link.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.start_date.label }}<br>
-            {{ form.start_date() }}<br>
-            {% for error in form.start_date.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>
-            {{ form.end_date.label }}<br>
-            {{ form.end_date() }}<br>
-            {% for error in form.end_date.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </p>
-        <p>{{ form.submit(onclick="reloadParent()") }}</p>
+            <div class="field-box">
+                <a class="field-name">Name:</a>
+                {{ form.component_name(size=32, class_=("field")) }}
+                {% for error in form.component_name.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="field-box">
+                <a class="field-name">Category:</a>
+                {{ form.category_id(class_=("field")) }}
+                {% for error in form.category_id.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="field-box">
+                <a class="field-name">Type:</a>
+                {{ form.type_id(class_=("field")) }}
+                {% for error in form.type_id.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+
+            <div class="field-box">
+                <a class="field-name">Cost:</a>
+                {{ form.base_cost(class_=("field")) }}
+                {% for error in form.base_cost.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="field-box">
+                <a class="field-name">Currency:</a>
+                {{ form.currency(class_=("field")) }}
+                {% for error in form.currency.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="field-box">
+                <a class="field-name">Description:</a>
+                {{ form.description(class_=("field"), style_=("height: 5em;")) }}
+                {% for error in form.description.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="field-box">
+                <a class="field-name">Link:</a>
+                {{ form.link(class_=("field")) }}
+                {% for error in form.link.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+
+            <div class="field-box">
+                <a class="field-name">Start date:</a>
+                {{ form.start_date(class_=("field"), style_=("width:40em;")) }}
+                {% for error in form.start_date.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="field-box">
+                <a class="field-name">End date:</a>
+                {{ form.end_date(class_=("field"), style_=("width:40em;")) }}
+                {% for error in form.end_date.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+        <div class="btn">{{ form.submit(class_=("submit-btn")) }}</div>
     </form>
     <script> 
         // Script for dynamically updating the type select based on the category select
