@@ -8,12 +8,12 @@ from app.models import User, Trip, Component, ComponentCategory, ComponentType, 
 
 # Helper functions
 def get_category_choices():
-    return [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory)).all()]
+    return [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory).order_by(ComponentCategory.id)).all()]
 
 def get_type_choices(category_id=None):
     query = sa.select(ComponentType)
     if category_id:
-        query = query.where(ComponentType.category_id == category_id)
+        query = query.where(ComponentType.category_id == category_id).order_by(ComponentType.id)
     return [(t.id, t.type_name) for t in db.session.scalars(query).all()]
 
 def get_currency_choices():
