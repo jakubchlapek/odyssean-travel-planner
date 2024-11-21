@@ -3,6 +3,7 @@ import plotly.express as px
 from flask import Flask
 from app.plotlydash.data import fetch_data
 import numpy as np
+import pandas as pd
 
 
 def init_dash_app(server):
@@ -46,15 +47,33 @@ def init_callbacks(dash_app):
         dash.Input("data-store", "data")
     )
     def update_graph(data):
-        
         if data:
-            # Create a figure using the fetched data
+            # Convert data into a pandas DataFrame
+            df = pd.DataFrame(data)
+
+            # Check if required columns exist
+            required_columns = ["base_cost", "component_name", "exchange_rate", "category_name", "title"]
+            if not all(col in df.columns for col in required_columns[:-1]):  # Exclude "title" as it's not a column
+                raise ValueError(f"Missing one or more required columns: {required_columns[:-1]}")
+
+            # Filter rows where base_cost > 0
+            df = df[df["base_cost"] > 0]
+
+            if df.empty:
+                return px.line(title="No valid data to display.")
+
+            # Calculate adjusted cost
+            df["adjusted_cost"] = df["base_cost"] * df["exchange_rate"]
+
+            # Create a bar plot
             fig = px.bar(
-                x=data["component_name"],
-                y=np.array(data["base_cost"]) * np.array(data["exchange_rate"]),
+                data_frame=df,
+                x="component_name",
+                y="adjusted_cost",
                 title=data["title"],
-                labels={"x": "Component", "y": "Cost"},
-                color=data["category_name"])
+                labels={"component_name": "Component", "adjusted_cost": "Cost"},
+                color="category_name"
+            )
             return fig
         # Placeholder figure if no data is loaded yet
         return px.line(title="Waiting for data...")
