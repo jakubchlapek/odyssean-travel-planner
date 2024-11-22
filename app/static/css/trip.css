@@ -220,31 +220,33 @@ img {
 }
 
 .dash-container {
-    margin-top: 6em;
-    min-width: 45vmax;
+    min-width: 50vmax;
+    margin-top: 5.5em;
+    height: 100%;
+    overflow: none;
 }   
 
 #category-1 { /*Accomodation*/
-    background-color: rgb(157, 41, 41, 0.5);
+    background-color: #EA4848;
 }
 
 #category-2 { /*Food*/
-    background-color: rgb(41, 141, 41, 0.5);
+    background-color: #4FB477;
 }
 
 #category-3 { /*Transport*/
-    background-color: rgba(58, 101, 171, 0.5);
+    background-color: #85CCFF;
 }
 
 #category-4 { /*Entertainment*/
-    background-color: rgb(153, 36, 153, 0.5);
+    background-color: #A975A4;
 }
 
 #category-5 { /*Shopping*/
-    background-color: rgb(161, 161, 47, 0.5);
+    background-color: #FF9B42;
 }
 
 #category-6 { /*Other*/
-    background-color: rgb(151, 42, 42) 0.5;
+    background-color: #B8B8B8;
 }
 
