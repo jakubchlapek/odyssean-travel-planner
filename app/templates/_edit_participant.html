@@ -1,0 +1,16 @@
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/trip.css') }}">
+    <form class="trip-form" method="post">
+        {{ form.hidden_tag() }}
+            <div class="field-box">
+                <a class="field-name">Name:</a>
+                {{ form.participant_name(size=32, class_=("field")) }}
+                {% for error in form.participant_name.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+        <div class="btn">{{ form.submit(class_=("submit-btn")) }}</div>
+    </form>
+{% endblock %}
+
+<script src="{{ url_for('static', filename='js/delete_scripts.js') }}"></script>

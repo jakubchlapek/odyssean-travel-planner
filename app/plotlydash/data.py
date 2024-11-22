@@ -8,7 +8,8 @@ category_names = {i + 1: category for i, category in enumerate(Config.INIT_CATEG
 type_names = {i + 1: type_name for i, type_name in enumerate({type_ for types in Config.INIT_TYPES.values() for type_ in types})}
 
 
-def fetch_data(trip_id: int):
+
+def fetch_trip_data(trip_id: int):
     """Fetch components list and trip name from the database, run it to create_dataframe and return it."""
     app.logger.info(f"Fetching data for trip id: {trip_id}.")
     if not trip_id or not isinstance(trip_id, int):

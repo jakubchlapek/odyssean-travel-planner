@@ -1,7 +1,7 @@
 from dash import Dash, html, dcc, Input, Output
 import plotly.express as px
 from flask import Flask
-from app.plotlydash.data import fetch_data
+from app.plotlydash.data import fetch_trip_data
 import numpy as np
 import pandas as pd
 
@@ -39,6 +39,11 @@ def init_dash_app(server):
                 id="dropdown-categories",
                 multi=True,
             ),
+            dcc.Dropdown(
+                options=[
+                    {}
+                ]
+                ),
             dcc.RadioItems(
                 options=[
                     {'label': 'Include free components', 'value': True},
@@ -84,7 +89,7 @@ def init_callbacks(dash_app):
         except (ValueError, IndexError):
             return None
         
-        data = fetch_data(trip_id)
+        data = fetch_trip_data(trip_id)
         return data
     
     @dash_app.callback(

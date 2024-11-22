@@ -26,6 +26,28 @@ function deleteComponentAndReload(component_id) {
     }
 };
 
+function deleteParticipantAndReload(participant_id) {
+    if (confirm("Are you sure you want to delete this participant?")) {
+        fetch("/delete_participant/" + participant_id, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())  // Parse the response as JSON
+        .then(data => {
+            if (data.success) {
+                reloadPageAndParent();
+            } else {
+                alert(data.message || "Failed to delete the participant.");
+            }
+        }).catch(error => {
+            console.error("Error during deletion:", error);
+            alert("An error occurred while trying to delete the participant.");
+        });
+    }
+}
+
 function deleteTrip(trip_id, reload=true) { 
     // function will send a POST request to the server to delete the trip with the given trip_id
     // if reload is false, the page will redirect to homepage

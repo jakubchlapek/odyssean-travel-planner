@@ -65,6 +65,7 @@ iframe {
     min-height: 1.8em;
     margin-left: 0.5em;
     display: inline;
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.1);
 }
 
 .field-name {
@@ -113,7 +114,7 @@ img {
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
     width: 12em;
     transition: background-color 0.3s ease, color 0.3s ease;
-    margin-top: 1.8em;
+    margin-top: 1em;
     overflow: none;
 }
 
@@ -152,7 +153,7 @@ img {
     justify-content: space-between;
     align-items: center;
     width: 20em;
-    max-width: 25vmax;
+    max-width: 24vmax;
     height: 2.8em;
     padding: 0.5em;
     background-color: #eae3d6;
@@ -191,6 +192,7 @@ img {
 
 .component-delete a {
     padding: 0.1em 0.3em;
+    border-radius: 4px;
     width: auto;
 }
 
@@ -212,11 +214,61 @@ img {
     margin-top: 1.8em;
     max-width: 25vmax;
     min-width: 20vmax;
-    height: 30em;
+    height: 32em;
     overflow: none;
     padding: 1em;
     border-radius: 6px;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+.participants {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    white-space: nowrap;
+    height: 100em;
+    max-height: 8em;
+}
+
+.participants h2 {
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    font-size: 1.6em;
+    font-weight: 500;
+    margin: 0;
+}
+
+.participant-list {
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    white-space: nowrap;
+    height: 100%;
+    width: 20em;
+    max-width: 23vmax;
+}
+
+.participant-list a {
+    color: #2a3740;
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    font-size: 1.2em;
+    font-weight: 400;
+    padding: 0.2em 0.4em;
+    cursor: pointer;
+}
+
+.participant-list span {
+    padding: 0.2em 0.4em;
+    display: inline-block;
+}
+
+.participant-list span :hover{
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #e83b5e5a;
+    border-radius: 4px;
+}
+
+.add-participant {
+    margin-bottom: 2em;
 }
 
 .dash-container {

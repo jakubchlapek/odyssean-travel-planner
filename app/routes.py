@@ -2,11 +2,11 @@ from flask import render_template, flash, redirect, url_for, request, jsonify
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, EditProfileForm, TripForm, ComponentForm, EmptyForm
-from app.models import User, Trip, Component, ComponentCategory, ComponentType, ExchangeRates
+from app.forms import LoginForm, RegistrationForm, EditProfileForm, TripForm, ComponentForm, EmptyForm, ParticipantForm
+from app.models import User, Trip, Component, ComponentCategory, ComponentType, ExchangeRates, Participant
 
 
-# Helper functions
+# Helper functions for dynamically populating form choices
 def get_category_choices():
     return [(c.id, c.category_name) for c in db.session.scalars(sa.select(ComponentCategory).order_by(ComponentCategory.id)).all()]
 
@@ -18,6 +18,11 @@ def get_type_choices(category_id=None):
 
 def get_currency_choices():
     return [(e.currency_to, e.currency_to) for e in db.session.scalars(sa.select(ExchangeRates)).all()]
+
+def get_participant_choices(trip_id):
+    trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
+    participants = db.session.scalars(trip.participants.select())
+    return [(p.id, p.participant_name) for p in participants]
 
 # Routes
 @app.route('/', methods=['GET', 'POST'])
@@ -119,7 +124,21 @@ def trip(trip_id: int):
     """Trip page view where the user can see, add and delete trip components."""
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
     components = db.session.scalars(trip.components.select())
-    return render_template('trip.html', title="Trip", trip=trip, components=components, preferred_currency=current_user.preferred_currency)
+    participants = db.session.scalars(trip.participants.select())
+    form = ParticipantForm()
+    if form.validate_on_submit():
+        participant = Participant(
+            trip_id = trip.id,
+            participant_name = form.participant_name.data
+        )
+        db.session.add(participant)
+        db.session.commit()
+        app.logger.info(f"User {current_user.username}, id: {current_user.id} added a new participant: {form.participant_name.data}, id: {participant.id} to trip id: {trip.id}.")
+        flash('Your participant has been added!')
+        return redirect(url_for('trip', trip_id=trip_id))
+    return render_template('trip.html', title=f"{trip.trip_name}", trip=trip, form=form,
+                           components=components, participants=participants,
+                           preferred_currency=current_user.preferred_currency)
 
 
 @app.route('/component/<component_id>', methods=['GET', 'POST'])
@@ -132,6 +151,7 @@ def component(component_id: int):
     form.category_id.choices = get_category_choices()
     form.type_id.choices = get_type_choices(category_id=form.category_id.data)
     form.currency.choices = get_currency_choices()
+    form.participant_name.choices = get_participant_choices(component.trip_id)
 
     if form.validate_on_submit(): # Update the component
         component.category_id = form.category_id.data
@@ -139,6 +159,7 @@ def component(component_id: int):
         component.component_name = form.component_name.data
         component.base_cost = form.base_cost.data
         component.currency = form.currency.data
+        component.participant_id = form.participant_name.data
         component.description = form.description.data
         component.link = form.link.data
         component.start_date = form.start_date.data
@@ -153,6 +174,7 @@ def component(component_id: int):
         form.component_name.data = component.component_name
         form.base_cost.data = component.base_cost
         form.currency.data = component.currency
+        form.participant_name.data = component.participant_id
         form.description.data = component.description
         form.link.data = component.link
         form.start_date.data = component.start_date
@@ -169,6 +191,7 @@ def create_component(trip_id: int):
     form.category_id.choices = get_category_choices()
     form.type_id.choices = get_type_choices(category_id=form.category_id.data)
     form.currency.choices = get_currency_choices()
+    form.participant_name.choices = get_participant_choices(trip_id)
     if form.validate_on_submit():
         component = Component(
                 trip_id = trip_id,
@@ -176,6 +199,7 @@ def create_component(trip_id: int):
                 type_id = form.type_id.data, 
                 component_name = form.component_name.data,
                 base_cost = form.base_cost.data,
+                participant_id = form.participant_name.data,
                 currency = form.currency.data,
                 description = form.description.data,
                 link = form.link.data,
@@ -211,12 +235,12 @@ def delete_trip(trip_id: int):
     )
     if trip is None:
         app.logger.warning(f"User {current_user.username} tried to delete a non-existing or unauthorized trip {trip_id}")
-        return jsonify({"success": False, "message": "Trip not found or you do not have permission to delete it."}), 404
+        return {"success": False, "message": "Trip not found or you do not have permission to delete it."}, 404
 
     db.session.delete(trip)
     db.session.commit()
     app.logger.info(f"User {current_user.username} deleted trip {trip_id} successfully.")
-    return jsonify({"success": True, "message": "Trip deleted successfully."}), 200
+    return {"success": True, "message": "Trip deleted successfully."}, 200
 
 
 
@@ -230,13 +254,36 @@ def delete_component(component_id: int):
         .where(sa.and_(Component.id == component_id, Trip.user_id == current_user.id)))
     if component is None:
         app.logger.warning(f"User {current_user.username}, id: {current_user.id} tried to delete a non-existing or unauthorized component {component_id}")
-        return jsonify({"success": False, "message": "Component not found or you do not have permission to delete it."}), 404
+        return {"success": False, "message": "Component not found or you do not have permission to delete it."}, 404
 
     trip_id = component.trip_id
     db.session.delete(component)
     db.session.commit()
     app.logger.info(f"User {current_user.username}, id: {current_user.id} deleted component id: {component_id} from trip id: {trip_id}.")
-    return jsonify({"success": True, "trip_id": trip_id, "message": "Component deleted successfully."}), 200
+    return {"success": True, "trip_id": trip_id, "message": "Component deleted successfully."}, 200
 
 
+@app.route('/delete_participant/<participant_id>', methods=['POST'])
+@login_required
+def delete_participant(participant_id: int):
+    """AJAX route for processing the deletion in JS."""
+    participant = db.session.scalar(
+        sa.select(Participant)
+        .join(Trip)
+        .where(sa.and_(Participant.id == participant_id, Trip.user_id == current_user.id)))
+    if participant is None:
+        app.logger.warning(f"User {current_user.username}, id: {current_user.id} tried to delete a non-existing or unauthorized participant {participant_id}")
+        return {"success": False, "message": "Participant not found or you do not have permission to delete it."}, 404
 
+    # Remove the participant from all components
+    db.session.execute(
+            sa.update(Component)
+            .where(Component.participant_id == participant_id)
+            .values(participant_id=None)
+        )
+    
+    trip_id = participant.trip_id
+    db.session.delete(participant)
+    db.session.commit()
+    app.logger.info(f"User {current_user.username}, id: {current_user.id} deleted participant id: {participant_id} from trip id: {trip_id}.")
+    return {"success": True, "trip_id": trip_id, "message": "Participant deleted successfully."}, 200

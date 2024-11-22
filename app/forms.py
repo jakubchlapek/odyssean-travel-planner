@@ -105,6 +105,7 @@ class ComponentForm(FlaskForm):
     type_id = SelectField('Type name', choices=[], coerce=int, validators=[DataRequired()])
     base_cost = DecimalField('Cost', default=0.0, places=2, validators=[InputRequired(), NumberRange(min=0)])
     currency = SelectField('Cost currency', choices=[], default="PLN", validators=[Length(min=3, max=3)])
+    participant_name = SelectField('Participant', choices=[], coerce=int, validators=[Optional()])
     description = TextAreaField('Description', validators=[Length(min=0, max=140)], render_kw={"placeholder": "Describe your component here."})
     link = StringField('Link', validators=[Length(min=0, max=2083)], render_kw={"placeholder": "Add a link to your component."})
     start_date = DateField('Start date', validators=[Optional()])
@@ -155,6 +156,15 @@ class ComponentForm(FlaskForm):
             app.logger.info(f"Date range for component is valid: {self.start_date.data} to {self.end_date.data}")
             return True
         return False
+
+
+class ParticipantForm(FlaskForm):
+    participant_name = StringField('Participant', validators=[DataRequired(), Length(min=3, max=20)])
+    submit = SubmitField('Submit')
+    
+    def validate(self, **kwargs):
+        app.logger.info("Validating participant form submission.")
+        return super().validate(**kwargs)
 
 
 class EmptyForm(FlaskForm):

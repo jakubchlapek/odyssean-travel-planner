@@ -79,8 +79,9 @@ class Trip(db.Model):
     
     user: so.Mapped[User] = so.relationship(back_populates='trips')
     components: so.WriteOnlyMapped['Component'] = so.relationship(cascade='all, delete', back_populates='trip', passive_deletes=True)
+    participants: so.WriteOnlyMapped['Participant'] = so.relationship(cascade='all, delete', back_populates='trip', passive_deletes=True)
 
-    def get_total_cost(self) -> float:
+    def get_total_cost(self) -> float: # Not currently used
         """Get the total cost of all components in the trip converted to the user's preferred currency. Rounded to 2 decimal places."""
         components = db.session.scalars(self.components.select())
         cost = np.sum(
@@ -94,6 +95,25 @@ class Trip(db.Model):
 
     def __repr__(self):
         return f'<Trip {self.trip_name}, trip_id {self.id}, user_id {self.user_id}>'
+    
+    
+class Participant(db.Model):
+    """Participant model for storing individual participants in each trip
+    
+    Fields:
+    - id: primary key | int
+    - trip_id: foreign key | int
+    - participant_name: name of each participant | str
+    
+    Foreign key relationships:
+    - trip: many-to-one relationship with Trip model"""
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    trip_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey('trip.id', name='fk_participant_trip_id', ondelete='CASCADE'), index=True)
+    participant_name: so.Mapped[str] = so.mapped_column(sa.String(20))
+    
+    trip: so.Mapped[Trip] =  so.relationship(back_populates='participants')
+    components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='participant', passive_deletes=True)
 
 
 class ComponentCategory(db.Model):    
@@ -165,6 +185,8 @@ class Component(db.Model):
         sa.ForeignKey('component_category.id', name='fk_component_category_id'), index=True)
     type_id: so.Mapped[int] = so.mapped_column(
         sa.ForeignKey('component_type.id', name='fk_component_type_id'), index=True)
+    participant_id: so.Mapped[int] = so.mapped_column(
+        sa.ForeignKey('participant.id', name='fk_component_participant_id'), index=True, nullable=True)
     component_name: so.Mapped[str] = so.mapped_column(sa.String(64))
     base_cost: so.Mapped[float] = so.mapped_column(sa.DECIMAL(10, 2))
     currency: so.Mapped[str] = so.mapped_column(sa.String(3))
@@ -176,6 +198,7 @@ class Component(db.Model):
     trip: so.Mapped[Trip] = so.relationship(back_populates='components')
     category: so.Mapped[ComponentCategory] = so.relationship(back_populates='components')
     type: so.Mapped[ComponentType] = so.relationship(back_populates='components')
+    participant: so.Mapped[Participant] = so.relationship(back_populates='components')
 
     def __repr__(self):
         return f'{self.component_name}, {self.base_cost} {self.currency}'

@@ -1,0 +1,5 @@
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/trip.css') }}">
+    <script src="{{ url_for('static', filename='js/delete_scripts.js') }}"></script>
+    <span><a onclick="deleteParticipantAndReload({{ participant.id }})">{{ participant.participant_name }}</a></span>
+{% endblock %}

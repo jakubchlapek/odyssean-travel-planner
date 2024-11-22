@@ -19,6 +19,17 @@
             <div class="btn add-btn">
                 <input class="submit-btn" type="button" value="Add new component" onclick="setNewEditedComponent({{ trip.id }})"></input>
             </div>
+            <div class="participants">
+                <h2>Participants</h2>
+                <div class="participant-list">
+                    {% for participant in participants %}
+                        {% include '_participant.html' %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="add-participant">
+                {% include "_edit_participant.html" %}
+            </div>
         </div>
         <div class="half-column">
             <div id="edit-component">

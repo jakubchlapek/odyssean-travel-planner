@@ -39,6 +39,13 @@
                 {% endfor %}
             </div>
             <div class="field-box">
+                <a class="field-name">Participant:</a>
+                {{ form.participant_name(class_=("field")) }}
+                {% for error in form.currency.errors %}
+                <span class="error">[{{ error }}]</span>
+                {% endfor %}
+            </div>
+            <div class="field-box">
                 <a class="field-name">Description:</a>
                 {{ form.description(class_=("field"), style_=("height: 5em;")) }}
                 {% for error in form.description.errors %}
