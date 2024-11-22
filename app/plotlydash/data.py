@@ -7,15 +7,6 @@ import sqlalchemy as sa
 category_names = {i + 1: category for i, category in enumerate(Config.INIT_CATEGORIES)}
 type_names = {i + 1: type_name for i, type_name in enumerate({type_ for types in Config.INIT_TYPES.values() for type_ in types})}
 
-def get_trip_info(trip_id: int):
-    """Fetch trip name, cost and currency, return a tuple (name, cost)"""
-    app.logger.info(f"Fetching name and cost for trip id: {trip_id}.")
-    if not trip_id or not isinstance(trip_id, int):
-        return None
-    trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
-    preferred_currency = trip.user.preferred_currency if trip.user else "PLN"
-    return (trip.trip_name, trip.get_total_cost(), preferred_currency)
-
 
 def fetch_data(trip_id: int):
     """Fetch components list and trip name from the database, run it to create_dataframe and return it."""
@@ -25,11 +16,12 @@ def fetch_data(trip_id: int):
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
     preferred_currency = trip.user.preferred_currency if trip.user else "PLN"
     components = db.session.scalars(trip.components.select()).all()
-    data = data_to_dict(components, preferred_currency)
+    trip_name = trip.trip_name if trip else "Unknown Trip"
+    data = data_to_dict(components, trip_name, preferred_currency)
     return data
 
 
-def data_to_dict(components: list[Component],  preferred_currency: str) -> dict:
+def data_to_dict(components: list[Component], trip_name: str, preferred_currency: str) -> dict:
     """Create a dictionary created from a list of components.
     
     Returns:
@@ -53,4 +45,4 @@ def data_to_dict(components: list[Component],  preferred_currency: str) -> dict:
         "exchange_rate": [get_exchange_rate(c.currency, preferred_currency) for c in components],
     }
     
-    return (data, preferred_currency)
+    return (data, preferred_currency, trip_name)

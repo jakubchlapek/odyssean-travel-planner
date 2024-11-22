@@ -103,7 +103,7 @@ class ComponentForm(FlaskForm):
     component_name = StringField('Component name', validators=[DataRequired()])
     category_id = SelectField('Category name', choices=[], coerce=int, validators=[DataRequired()])
     type_id = SelectField('Type name', choices=[], coerce=int, validators=[DataRequired()])
-    base_cost = DecimalField('Cost', default=0.0, places=2, validators=[InputRequired(), NumberRange(min=0), Length(min=1, max=18)])
+    base_cost = DecimalField('Cost', default=0.0, places=2, validators=[InputRequired(), NumberRange(min=0)])
     currency = SelectField('Cost currency', choices=[], default="PLN", validators=[Length(min=3, max=3)])
     description = TextAreaField('Description', validators=[Length(min=0, max=140)], render_kw={"placeholder": "Describe your component here."})
     link = StringField('Link', validators=[Length(min=0, max=2083)], render_kw={"placeholder": "Add a link to your component."})
