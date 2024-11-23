@@ -239,12 +239,15 @@ img {
 
 .participant-list {
     margin: 0;
+    margin-top: 0.2em;
     overflow-x: hidden;
     overflow-y: auto;
     white-space: nowrap;
     height: 100%;
     width: 20em;
     max-width: 23vmax;
+    flex-wrap: wrap;
+    display: flex;
 }
 
 .participant-list a {
@@ -254,11 +257,15 @@ img {
     font-weight: 400;
     padding: 0.2em 0.4em;
     cursor: pointer;
+    background-color: #eae3d6;
+    border-radius: 4px;
 }
 
 .participant-list span {
     padding: 0.2em 0.4em;
     display: inline-block;
+    word-wrap: normal;
+    white-space: normal;
 }
 
 .participant-list span :hover{
@@ -301,4 +308,3 @@ img {
 #category-6 { /*Other*/
     background-color: #B8B8B8;
 }
-

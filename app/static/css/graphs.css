@@ -16,5 +16,41 @@
     font-weight: 500;
     margin: 0;
     width: 32em;
+}
 
+#graph-buttons {
+    display: flex;
+    flex-direction: row;
+    max-height: 10em;
+    font-family: "Fira Sans", "Roboto", sans-serif;
+    margin-top: 0.5em;
+    margin-left: 0.2em;
+}
+
+#dropdown-categories {
+    width: 15em;
+}
+
+#categories-box {
+    display: block;
+}
+
+#dropdown-participants {
+    width: 15em;
+}
+#participants-box {
+    margin-left: 2em;
+}
+
+#radio-include-free {
+    margin-left: 2em;
+    margin-top: 1em;
+    text-align: center;
+}
+
+#radio-include-free label {
+    padding: 0.2em;
+    background-color: #eae3d6;
+    margin-bottom: 0.2em;
+    border-radius: 4px;
 }

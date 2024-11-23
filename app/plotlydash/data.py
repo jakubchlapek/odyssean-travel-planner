@@ -7,7 +7,16 @@ import sqlalchemy as sa
 category_names = {i + 1: category for i, category in enumerate(Config.INIT_CATEGORIES)}
 type_names = {i + 1: type_name for i, type_name in enumerate({type_ for types in Config.INIT_TYPES.values() for type_ in types})}
 
-
+def fetch_participants(trip_id: int):
+    """Fetch participants list from the database, change it into a list of names, and return it."""
+    app.logger.info(f"Fetching participants for trip id: {trip_id}.")
+    if not trip_id or not isinstance(trip_id, int):
+        return None
+    trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
+    participants = db.session.scalars(trip.participants.select()).all()
+    participants = [(p.participant_name, p.id) for p in participants]
+    app.logger.debug(f"Participants for trip id {trip_id}: {participants}.")
+    return participants
 
 def fetch_trip_data(trip_id: int):
     """Fetch components list and trip name from the database, run it to create_dataframe and return it."""
@@ -38,6 +47,7 @@ def data_to_dict(components: list[Component], trip_name: str, preferred_currency
         "category_name": [category_names.get(c.category_id, "Unknown Category") for c in components],
         "type_name": [type_names.get(c.type_id, "Unknown Subcategory") for c in components],
         "base_cost": [getattr(c, 'base_cost', 0.0) for c in components],
+        "participant_id": [getattr(c, 'participant_id', None) for c in components],
         "link": [getattr(c, 'link', None) for c in components], 
         "description": [getattr(c, 'description', "") for c in components],
         "start_date": [getattr(c, 'start_date', pd.NaT) for c in components], 

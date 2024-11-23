@@ -1,7 +1,7 @@
 from dash import Dash, html, dcc, Input, Output
 import plotly.express as px
 from flask import Flask
-from app.plotlydash.data import fetch_trip_data
+from app.plotlydash.data import fetch_trip_data, fetch_participants
 import numpy as np
 import pandas as pd
 
@@ -19,31 +19,37 @@ def init_dash_app(server):
     
     dash_app.layout = html.Div(id='dash-container', children=[
         dcc.Location(id="url", refresh=False),
-        dcc.Store(id="data-store"),  # Store to hold fetched data
+        dcc.Store(id="data-store-trip"),  # Store to hold fetched data
+        dcc.Store(id="data-store-participants"),  # Store to hold fetched participants
         html.H1(id="trip-title", children=[]),
         html.Div(id='budget-graphs-box', children=[
             dcc.Graph(id='budget-bar-graph'), 
             dcc.Graph(id='budget-pie-graph')
         ]),
         html.Div(id="graph-buttons", children=[
-            html.Label('Choose categories'),
-            dcc.Dropdown(
-                options=[
-                    {'label': 'Accommodation', 'value': 'Accommodation'},
-                    {'label': 'Food', 'value': 'Food'},
-                    {'label': 'Transport', 'value': 'Transport'},
-                    {'label': 'Entertainment', 'value': 'Entertainment'},
-                    {'label': 'Other', 'value': 'Other'}
-                ],                
-                value=['Accommodation', 'Food', 'Transport', 'Entertainment', 'Other'],
-                id="dropdown-categories",
-                multi=True,
-            ),
-            dcc.Dropdown(
-                options=[
-                    {}
-                ]
-                ),
+            html.Div(id="categories-box", children=[
+                html.Label('Choose categories'),
+                dcc.Dropdown(
+                    options=[
+                        {'label': 'Accommodation', 'value': 'Accommodation'},
+                        {'label': 'Food', 'value': 'Food'},
+                        {'label': 'Transport', 'value': 'Transport'},
+                        {'label': 'Entertainment', 'value': 'Entertainment'},
+                        {'label': 'Other', 'value': 'Other'}
+                    ],                
+                    value=['Accommodation', 'Food', 'Transport', 'Entertainment', 'Other'],
+                    id="dropdown-categories",
+                    multi=True,
+                    ),
+            ]),
+            html.Div(id="participants-box", children=[
+                html.Label('Choose participants'),
+                dcc.Dropdown(
+                    options=[],
+                    id="dropdown-participants",
+                    multi=True,
+                    ),
+            ]),
             dcc.RadioItems(
                 options=[
                     {'label': 'Include free components', 'value': True},
@@ -61,26 +67,34 @@ def init_dash_app(server):
     return dash_app.server
     
     
-def filter_df(trip_data: dict, chosen_categories: list[str], include_free: bool) -> pd.DataFrame:
+def filter_df(trip_data: dict, chosen_categories: list[str], chosen_participants: list[str], include_free: bool) -> pd.DataFrame:
     """Filters the data provided based on the settings chosen by user and returns a panda dataframe"""
     df = pd.DataFrame(trip_data)
     required_columns = ["base_cost", "component_name", "exchange_rate", "category_name"]
     if not all(col in df.columns for col in required_columns):
         raise ValueError(f"Missing one or more required columns: {required_columns}")
-        
+    
+    # Filter by chosen participants
+    temp_df = pd.DataFrame()
+    if chosen_participants:
+        if -1 in chosen_participants:
+            temp_df = df[df["participant_id"].isna()]
+        df = df[df["participant_id"].isin(chosen_participants)]
+    df = pd.concat([df, temp_df])
     # Filter rows where base_cost > 0
     if not include_free:
         df = df[df["base_cost"] > 0]
         
     # Filter by chosen_categories
-    df = df[df["category_name"].isin(chosen_categories)] 
+    if chosen_categories:
+        df = df[df["category_name"].isin(chosen_categories)] 
     
     return df
     
 
 def init_callbacks(dash_app):    
     @dash_app.callback(
-    Output("data-store", "data"),
+    Output("data-store-trip", "data"),
     Input("url", "pathname")
     )
     def load_data(pathname):
@@ -93,15 +107,39 @@ def init_callbacks(dash_app):
         return data
     
     @dash_app.callback(
+    Output("data-store-participants", "data"),
+    Input("url", "pathname")
+    )
+    def load_participants(pathname):
+        try:
+            trip_id = int(pathname.split("/")[-1])  # Attempt to extract trip ID
+        except (ValueError, IndexError):
+            return None
+        
+        participants = fetch_participants(trip_id)
+        return participants
+    
+    @dash_app.callback(
+    Output("dropdown-participants", "options"), 
+    Output("dropdown-participants", "value"),
+    Input("data-store-participants", "data"),
+    )
+    def update_dropdown_from_store(participants):
+        dropdown_options = [{"label": p[0], "value": p[1]} for p in participants]
+        dropdown_options.append({"label": "Shared components", "value": -1})
+        return dropdown_options, participants
+    
+    @dash_app.callback(
         Output("trip-title", "children"),
-        Input("data-store", "data"),
+        Input("data-store-trip", "data"),
         Input("dropdown-categories", "value"),
+        Input("dropdown-participants", "value"),
         Input("radio-include-free", "value")
     )
-    def get_title(data, chosen_categories, include_free):
+    def get_title(data, chosen_categories, chosen_participants, include_free):
         if not data:
             return "No data loaded yet."
-        df = filter_df(data[0], chosen_categories, include_free)
+        df = filter_df(data[0], chosen_categories, chosen_participants, include_free)
         trip_cost = np.sum(df["base_cost"] * df["exchange_rate"])
         preferred_currency = data[1]
         trip_name = data[2]
@@ -109,16 +147,17 @@ def init_callbacks(dash_app):
     
     @dash_app.callback(
         Output("budget-bar-graph", "figure"),
-        Input("data-store", "data"),
+        Input("data-store-trip", "data"),
         Input("dropdown-categories", "value"),
+        Input("dropdown-participants", "value"),
         Input("radio-include-free", "value")
     )
-    def add_bar_graph(data, chosen_categories, include_free):
+    def add_bar_graph(data, chosen_categories, chosen_participants, include_free):
         if not data:
             # Placeholder figure if no data is loaded yet
             return px.line(title="Waiting for data...", height=365, width=365)    
             
-        df = filter_df(data[0], chosen_categories, include_free)
+        df = filter_df(data[0], chosen_categories, chosen_participants, include_free)
         preferred_currency = data[1]
 
         if df.empty:
@@ -182,14 +221,16 @@ def init_callbacks(dash_app):
     
     @dash_app.callback(
         Output("budget-pie-graph", "figure"),
-        Input("data-store", "data"),
-        Input("dropdown-categories", "value")
+        Input("data-store-trip", "data"),
+        Input("dropdown-categories", "value"),
+        Input("dropdown-participants", "value"),
+        Input("radio-include-free", "value")
     )
-    def add_pie_graph(data, chosen_categories):
+    def add_pie_graph(data, chosen_categories, chosen_participants, include_free):
         if not data:
             # Placeholder figure if no data is loaded yet
             return px.line(title="Waiting for data...", height=365, width=365)    
-        df = filter_df(data[0], chosen_categories, include_free=False)
+        df = filter_df(data[0], chosen_categories, chosen_participants, include_free)
         preferred_currency = data[1]
 
         if df.empty:
