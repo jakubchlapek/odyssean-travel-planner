@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request, jsonify
+from flask import render_template, flash, redirect, url_for, request, session
 import sqlalchemy as sa
 from flask_login import current_user, login_user, logout_user, login_required
 from app import app, db
@@ -23,6 +23,7 @@ def get_participant_choices(trip_id):
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
     participants = db.session.scalars(trip.participants.select())
     return [(p.id, p.participant_name) for p in participants]
+
 
 # Routes
 @app.route('/', methods=['GET', 'POST'])
@@ -100,7 +101,6 @@ def user(username: str):
 @login_required
 def edit_profile():
     """Edit profile page view where the user can change their username and preferred currency."""
-    url_on_return = request.referrer or url_for('user', username=current_user.username)
     form = EditProfileForm(current_user.username)
     form.currency.choices = get_currency_choices()
     if form.validate_on_submit():
@@ -110,12 +110,14 @@ def edit_profile():
         db.session.commit()
         app.logger.info(f"User {current_user.username}, id: {current_user.id} updated their profile.")
         flash("Your changes have been saved.")
-        return redirect(url_on_return)
+        return redirect(session['url_on_return'])
     elif request.method == 'GET':
+        if request.referrer:
+            session['url_on_return'] = request.referrer
         form.username.data = current_user.username
         form.currency.data = current_user.preferred_currency
         form.about_me.data = current_user.about_me
-    return render_template('edit_profile.html', title='Edit Profile', form=form, url_on_return = url_on_return)
+    return render_template('edit_profile.html', title='Edit Profile', form=form, url_on_return = session['url_on_return'])
 
 
 @app.route('/trip/<trip_id>', methods=['GET', 'POST'])
@@ -222,7 +224,7 @@ def type(category_id: int):
         sa.select(ComponentType)
         .where(ComponentType.category_id == category_id)).all()
     types_list = [(t.id, t.type_name) for t in types]
-    return jsonify({'types': types_list})
+    return {'types': types_list}
 
 
 @app.route('/delete_trip/<trip_id>', methods=['POST'])
