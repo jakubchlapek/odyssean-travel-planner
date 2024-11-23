@@ -160,7 +160,7 @@ class ComponentForm(FlaskForm):
 
 class ParticipantForm(FlaskForm):
     participant_name = StringField('Participant', validators=[DataRequired(), Length(min=3, max=20)])
-    submit = SubmitField('Submit')
+    submit = SubmitField('Add new participant')
     
     def validate(self, **kwargs):
         app.logger.info("Validating participant form submission.")

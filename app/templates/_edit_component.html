@@ -62,14 +62,14 @@
 
             <div class="field-box">
                 <a class="field-name">Start date:</a>
-                {{ form.start_date(class_=("field"), style_=("width:40em;")) }}
+                {{ form.start_date(class_=("field"), style_=("max-width:100%;")) }}
                 {% for error in form.start_date.errors %}
                 <span class="error">[{{ error }}]</span>
                 {% endfor %}
             </div>
             <div class="field-box">
                 <a class="field-name">End date:</a>
-                {{ form.end_date(class_=("field"), style_=("width:40em;")) }}
+                {{ form.end_date(class_=("field"), style_=("max-width:100%;")) }}
                 {% for error in form.end_date.errors %}
                 <span class="error">[{{ error }}]</span>
                 {% endfor %}
