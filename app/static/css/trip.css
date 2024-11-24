@@ -147,12 +147,39 @@ img {
     height: 100%;
 }
 
+.component-box {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    margin: 0;
+}
+
+.component-activation {
+    margin-bottom: 0.3em;
+}
+
+.component-activation img {
+    width: 2em;
+    height: auto;
+    padding: 0.2em;
+    margin-left: 0.5em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 4px;
+}
+
+.component-activation  :hover {
+    background-color: #eae3d6;
+    border-radius: 4px;
+}
+
 .component-row {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 20em;
+    width: 19em;
     max-width: 24vmax;
     height: 2.8em;
     padding: 0.5em;
@@ -162,7 +189,7 @@ img {
 }
 
 .component-row a {
-    color: #2a3740;
+    color: #1e272e;
     font-family: "Fira Sans", "Roboto", sans-serif;
     font-size: 1em;
     font-weight: 400;

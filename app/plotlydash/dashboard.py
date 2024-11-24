@@ -148,7 +148,8 @@ def init_callbacks(dash_app):
         trip_cost = np.sum(df["base_cost"] * df["exchange_rate"])
         preferred_currency = data[1]
         trip_name = data[2]
-        return f"Trip: {trip_name} - total cost: {trip_cost:.2f} {preferred_currency}"
+        length_str = f"({len(df)} components)" if len(df) != 1 else " (1 component)"
+        return f"Trip: {trip_name} - total cost: {trip_cost:.2f} {preferred_currency} - {length_str}"
     
     @dash_app.callback(
         Output("budget-bar-graph", "figure"),

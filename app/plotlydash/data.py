@@ -25,7 +25,7 @@ def fetch_trip_data(trip_id: int):
         return None
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
     preferred_currency = trip.user.preferred_currency if trip.user else "PLN"
-    components = db.session.scalars(trip.components.select()).all()
+    components = trip.get_active_components()
     trip_name = trip.trip_name if trip else "Unknown Trip"
     data = data_to_dict(components, trip_name, preferred_currency)
     return data

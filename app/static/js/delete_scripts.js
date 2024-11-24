@@ -88,3 +88,23 @@ function changeEditedComponent(component_id) {
         edit_component.innerHTML = '<iframe class="edit-component" src="/component/' + component_id + '"></iframe>';
     }
 }
+
+function activateComponent(component_id) {
+    fetch("/activate_component/" + component_id, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())  // Parse the response as JSON
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.message || "Failed to activate the component.");
+        }
+    }).catch(error => {
+        console.error("Error during activation:", error);
+        alert("An error occurred while trying to activate the component.");
+    });
+}

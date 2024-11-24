@@ -24,6 +24,9 @@ def get_participant_choices(trip_id):
     participants = db.session.scalars(trip.participants.select())
     return [(p.id, p.participant_name) for p in participants]
 
+# Helper auth
+def is_current_user(user_id):
+    return current_user.id == user_id
 
 # Routes
 @app.route('/', methods=['GET', 'POST'])
@@ -125,7 +128,7 @@ def edit_profile():
 def trip(trip_id: int):
     """Trip page view where the user can see, add and delete trip components."""
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
-    if trip.user_id != current_user.id:
+    if not is_current_user(trip.user_id):
         flash("You do not have permission to view this trip.")
         app.logger.warning(f"User {current_user.username}, id: {current_user.id} tried to access unauthorized trip {trip_id}.")
         return redirect(url_for('user', username=current_user.username))
@@ -293,3 +296,34 @@ def delete_participant(participant_id: int):
     db.session.commit()
     app.logger.info(f"User {current_user.username}, id: {current_user.id} deleted participant id: {participant_id} from trip id: {trip_id}.")
     return {"success": True, "trip_id": trip_id, "message": "Participant deleted successfully."}, 200
+
+@app.route('/activate_component/<component_id>', methods=['POST'])
+@login_required
+def activate_component(component_id: int):
+    """AJAX route for processing the activation in JS."""
+    component = db.session.scalar(
+        sa.select(Component)
+        .join(Trip)
+        .where(sa.and_(Component.id == component_id, Trip.user_id == current_user.id)))
+    if component is None:
+        app.logger.warning(f"User {current_user.username}, id: {current_user.id} tried to activate a non-existing or unauthorized component {component_id}")
+        return {"success": False, "message": "Component not found or you do not have permission to activate it."}, 404
+
+    component.is_active = not component.is_active
+    db.session.commit()
+    app.logger.info(f"User {current_user.username}, id: {current_user.id} activated component id: {component_id}.")
+    return {"success": True, "message": "Component activated successfully."}, 200
+
+# WIP
+@app.route('/summary/<trip_id>')
+@login_required
+def get_trip_summary(trip_id: int):
+    """Route to get a file with the trip summary."""
+    trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
+    if not is_current_user(trip.user_id):
+        flash("You do not have permission to view this trip.")
+        app.logger.warning(f"User {current_user.username}, id: {current_user.id} tried to access unauthorized trip {trip_id} summary.")
+        return redirect(url_for('user', username=current_user.username))
+    components = db.session.scalars(trip.components.select())
+    participants = db.session.scalars(trip.participants.select())
+    return render_template('summary.html', trip=trip, components=components, participants=participants, preferred_currency=current_user.preferred_currency)

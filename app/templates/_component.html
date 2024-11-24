@@ -1,12 +1,21 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/trip.css') }}">
-<div class="component-row" id="category-{{component.category_id}}">
-    <span class="component-name"><a onclick="changeEditedComponent({{component.id|tojson}})">{{ component }}</a></span>
-    <div class="component-buttons">
-        {% if component.link %}
-            <span class="component-link"><a id="link" onclick=" window.open('{{ component.link }}','_blank')">Link</a></span> 
+<div class="component-box">
+    <div class="component-row" id="category-{{component.category_id}}">
+        <span class="component-name"><a onclick="changeEditedComponent({{component.id|tojson}})">{{ component }}</a></span>
+        <div class="component-buttons">
+            {% if component.link %}
+                <span class="component-link"><a id="link" onclick=" window.open('{{ component.link }}','_blank')">Link</a></span> 
+            {% endif %}
+            <span class="component-delete"><a id="delete" href="#" onclick="deleteComponentAndReload({{component.id|tojson}})">Delete</a></span> 
+        <!--I call |tojson so JS knows it's safe and reload=false as I want to redirect-->
+        </div>
+    </div>
+    <div class="component-activation" onclick="activateComponent({{component.id|tojson}})">
+        {% if component.is_active %}
+        <img src="{{ url_for('static', filename='svg/box-active.svg') }}">
+        {% else %}
+        <img src="{{ url_for('static', filename='svg/box-inactive.svg') }}">
         {% endif %}
-        <span class="component-delete"><a id="delete" href="#" onclick="deleteComponentAndReload({{component.id|tojson}})">Delete</a></span> 
-    <!--I call |tojson so JS knows it's safe and reload=false as I want to redirect-->
     </div>
 </div>
 <script src="{{ url_for('static', filename='js/delete_scripts.js') }}"></script>

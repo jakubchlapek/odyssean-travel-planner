@@ -92,6 +92,10 @@ class Trip(db.Model):
         if not cost:
             cost = 0.0
         return round(cost, 2)
+    
+    def get_active_components(self) -> list['Component']:
+        """Get all active components in the trip."""
+        return db.session.scalars(self.components.select().where(Component.is_active == True)).all()
 
     def __repr__(self):
         return f'<Trip {self.trip_name}, trip_id {self.id}, user_id {self.user_id}>'
@@ -173,6 +177,7 @@ class Component(db.Model):
     - link: URL to the component | str | optional
     - start_date: start date of the component | datetime | optional
     - end_date: end date of the component | datetime | optional
+    - is_active: whether the component is active | bool | default True
     
     Foreign key relationships:
     - trip: many-to-one relationship with Trip model
@@ -194,6 +199,7 @@ class Component(db.Model):
     link: so.Mapped[Optional[str]] = so.mapped_column(sa.String(2083)) # lowest common denominator for URL length
     start_date: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime)
     end_date: so.Mapped[Optional[datetime]] = so.mapped_column(sa.DateTime)
+    is_active: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=True)
 
     trip: so.Mapped[Trip] = so.relationship(back_populates='components')
     category: so.Mapped[ComponentCategory] = so.relationship(back_populates='components')
