@@ -78,8 +78,8 @@ class Trip(db.Model):
         sa.DateTime, index=True, default=lambda: datetime.now(timezone.utc))
     
     user: so.Mapped[User] = so.relationship(back_populates='trips')
-    components: so.WriteOnlyMapped['Component'] = so.relationship(cascade='all, delete', back_populates='trip', passive_deletes=True)
-    participants: so.WriteOnlyMapped['Participant'] = so.relationship(cascade='all, delete', back_populates='trip', passive_deletes=True)
+    components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='trip', passive_deletes=True)
+    participants: so.WriteOnlyMapped['Participant'] = so.relationship(back_populates='trip', passive_deletes=True)
 
     def get_total_cost(self) -> float: # Not currently used
         """Get the total cost of all components in the trip converted to the user's preferred currency. Rounded to 2 decimal places."""
@@ -116,7 +116,7 @@ class Participant(db.Model):
         sa.ForeignKey('trip.id', name='fk_participant_trip_id', ondelete='CASCADE'), index=True)
     participant_name: so.Mapped[str] = so.mapped_column(sa.String(20))
     
-    trip: so.Mapped[Trip] =  so.relationship(back_populates='participants')
+    trip: so.Mapped[Trip] =  so.relationship(back_populates='participants', passive_deletes=True)
     components: so.WriteOnlyMapped['Component'] = so.relationship(back_populates='participant', passive_deletes=True)
 
 
@@ -204,7 +204,7 @@ class Component(db.Model):
     trip: so.Mapped[Trip] = so.relationship(back_populates='components')
     category: so.Mapped[ComponentCategory] = so.relationship(back_populates='components')
     type: so.Mapped[ComponentType] = so.relationship(back_populates='components')
-    participant: so.Mapped[Participant] = so.relationship(back_populates='components')
+    participant: so.Mapped[Participant] = so.relationship(back_populates='components', passive_deletes=True)    
 
     def __repr__(self):
         return f'{self.component_name}, {self.base_cost} {self.currency}'
