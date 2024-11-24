@@ -184,6 +184,13 @@ img {
     padding: 0.2em 0.4em;
 }
 
+.component-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .component-delete {
     border-radius: 4px;
     display: flex;
@@ -194,6 +201,27 @@ img {
     padding: 0.1em 0.3em;
     border-radius: 4px;
     width: auto;
+}
+
+.component-link {
+    border-radius: 4px;
+    display: flex;
+    justify-content: flex-end; 
+    cursor: pointer;
+    margin-right: 0.1em;
+}
+
+.component-link a {
+    padding: 0.1em 0.3em;
+    border-radius: 4px;
+    width: auto;
+}
+
+.component-link :hover {
+    text-decoration: none;
+    background-color: #85CCFF5a;
+    color: #222c34;
+    border-radius: 4px;
 }
 
 .component-name :hover {

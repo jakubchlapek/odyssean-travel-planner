@@ -1,4 +1,6 @@
 from dash import Dash, html, dcc, Input, Output
+from dash.exceptions import PreventUpdate
+import webbrowser
 import plotly.express as px
 from flask import Flask
 from app.plotlydash.data import fetch_trip_data, fetch_participants
@@ -125,10 +127,13 @@ def init_callbacks(dash_app):
     Input("data-store-participants", "data"),
     )
     def update_dropdown_from_store(participants):
+        if not participants:
+            return [], []  # Return empty options and value if no participants
         dropdown_options = [{"label": p[0], "value": p[1]} for p in participants]
         dropdown_options.append({"label": "Shared components", "value": -1})
-        return dropdown_options, participants
-    
+        return dropdown_options, [option["value"] for option in dropdown_options] # Default all participants selected
+ 
+        
     @dash_app.callback(
         Output("trip-title", "children"),
         Input("data-store-trip", "data"),

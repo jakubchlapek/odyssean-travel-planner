@@ -125,6 +125,10 @@ def edit_profile():
 def trip(trip_id: int):
     """Trip page view where the user can see, add and delete trip components."""
     trip = db.first_or_404(sa.select(Trip).where(Trip.id == trip_id))
+    if trip.user_id != current_user.id:
+        flash("You do not have permission to view this trip.")
+        app.logger.warning(f"User {current_user.username}, id: {current_user.id} tried to access unauthorized trip {trip_id}.")
+        return redirect(url_for('user', username=current_user.username))
     components = db.session.scalars(trip.components.select())
     participants = db.session.scalars(trip.participants.select())
     form = ParticipantForm()
