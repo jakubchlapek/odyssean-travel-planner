@@ -23,4 +23,4 @@ else
 fi
 
 echo "Starting Flask application..."
-flask run --reload 
+exec gunicorn -b :5000 -w 4 travel-planner:app
