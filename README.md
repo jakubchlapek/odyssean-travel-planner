@@ -37,7 +37,7 @@ docker compose up --build
 
 **Client:** HTML, Jinja2, CSS, JS, Plotly Express
 
-**Server:** Flask, Docker compose, Gunicorn, Dash
+**Server:** Flask, Docker compose, Gunicorn, Dash, MySQL database
 
 ## Color Reference
 In the project I use a color scheme for the component categories, here it is to make reading the app easier:
