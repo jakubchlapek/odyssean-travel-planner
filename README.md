@@ -59,6 +59,8 @@ Ability to change user info
 ![image](https://github.com/user-attachments/assets/fb9086af-75ce-41b0-928f-a6f89261d557)
 Main trip view
 ![image](https://github.com/user-attachments/assets/1d4a7665-0902-40a1-9957-d0958e7c0975)
+Database schema
+![image](https://github.com/user-attachments/assets/49486315-f4f9-4270-b96d-ad6769aec910)
 
 
 ## Running Tests
